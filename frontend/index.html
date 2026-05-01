@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CampusAI v7 — College Assistant</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07090f;--bg2:#0d1117;--bg3:#111827;--bg4:#1a2233;--bgh:#1e2d45;
+  --bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.11);--bd3:rgba(255,255,255,0.18);
+  --blue:#3b82f6;--bluedim:rgba(59,130,246,0.12);--blueglow:rgba(59,130,246,0.25);
+  --pur:#8b5cf6;--purdim:rgba(139,92,246,0.12);
+  --grn:#10b981;--grndim:rgba(16,185,129,0.12);
+  --amb:#f59e0b;--ambdim:rgba(245,158,11,0.12);
+  --red:#ef4444;--reddim:rgba(239,68,68,0.12);
+  --cyn:#06b6d4;
+  --tx:#f1f5f9;--tx2:#94a3b8;--tx3:#475569;--tx4:#2d3748;
+  --fh:'Space Grotesk',sans-serif;--fb:'Inter',sans-serif;--fm:'JetBrains Mono',monospace;
+  --r:10px;--rl:16px;--rxl:22px;--rs:6px;
+  --sh:0 2px 8px rgba(0,0,0,.3);--shm:0 8px 30px rgba(0,0,0,.45);--shl:0 20px 60px rgba(0,0,0,.55);
+  --tr:0.15s ease;--trm:0.25s ease;
+}
+body.light{
+  --bg:#f8fafc;--bg2:#ffffff;--bg3:#f1f5f9;--bg4:#e8edf5;--bgh:#e2e8f0;
+  --bd:rgba(0,0,0,.07);--bd2:rgba(0,0,0,.11);--bd3:rgba(0,0,0,.2);
+  --tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;--tx4:#cbd5e1;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:15px}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);line-height:1.6;min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+body:not(.light)::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 900px 600px at 0% 0%,rgba(59,130,246,.06) 0%,transparent 70%),
+             radial-gradient(ellipse 700px 500px at 100% 100%,rgba(139,92,246,.07) 0%,transparent 70%)}
+#app{position:relative;z-index:1}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--tx4);border-radius:4px}
+
+/* NAV */
+.navbar{position:sticky;top:0;z-index:300;display:flex;align-items:center;gap:6px;height:58px;padding:0 1.5rem;
+  background:rgba(7,9,15,.93);backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--bd)}
+body.light .navbar{background:rgba(248,250,252,.96)}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:var(--fh);font-size:1.05rem;font-weight:700;color:var(--tx);text-decoration:none;flex-shrink:0}
+.nav-logo-box{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--pur));display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 12px var(--blueglow)}
+.nav-div{width:1px;height:22px;background:var(--bd2);margin:0 8px;flex-shrink:0}
+.nav-tabs{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:5px 12px;border-radius:var(--rs);font-size:13px;font-weight:500;color:var(--tx2);cursor:pointer;border:none;background:transparent;font-family:var(--fb);white-space:nowrap;transition:all var(--tr);flex-shrink:0}
+.nav-tab:hover{color:var(--tx);background:var(--bgh)}
+.nav-tab.active{color:var(--blue);background:var(--bluedim)}
+.nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.status-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;background:var(--bg3);border:1px solid var(--bd);font-family:var(--fm);font-size:10.5px;color:var(--tx2);flex-shrink:0}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--tx4);transition:all .3s;flex-shrink:0}
+.sdot.online{background:var(--grn);box-shadow:0 0 8px var(--grn)}
+.sdot.error{background:var(--red)}
+.icon-btn{width:32px;height:32px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--bd);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all var(--tr)}
+.icon-btn:hover{border-color:var(--blue);color:var(--blue)}
+.user-chip{display:flex;align-items:center;gap:7px;padding:3px 10px 3px 4px;border-radius:99px;background:var(--bg3);border:1px solid var(--bd2);cursor:pointer;transition:all var(--tr)}
+.user-chip:hover{border-color:var(--blue)}
+.uav{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;font-family:var(--fh);flex-shrink:0}
+.uav-s{background:linear-gradient(135deg,var(--blue),var(--pur))}
+.uav-a{background:linear-gradient(135deg,var(--red),var(--amb))}
+.uname{font-size:13px;font-weight:500}
+.rtag{padding:1px 7px;border-radius:99px;font-size:9.5px;font-weight:700;font-family:var(--fm);text-transform:uppercase;letter-spacing:.04em}
+.rt-s{background:var(--bluedim);color:var(--blue)}
+.rt-a{background:var(--reddim);color:var(--red)}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block;animation:pgIn .22s ease}
+@keyframes pgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
+
+/* LOGIN */
+.login-page{min-height:calc(100vh - 58px);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.login-card{width:min(460px,100%);background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rxl);padding:2.4rem 2.2rem;box-shadow:var(--shl)}
+.login-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--pur));display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 1rem;box-shadow:0 0 20px var(--blueglow)}
+.login-title{font-family:var(--fh);font-size:1.5rem;font-weight:800;letter-spacing:-.03em;text-align:center}
+.login-sub{color:var(--tx2);font-size:13.5px;text-align:center;margin-top:4px;margin-bottom:1.8rem}
+.login-tabs{display:flex;background:var(--bg3);border-radius:var(--rs);padding:3px;margin-bottom:1.4rem;border:1px solid var(--bd)}
+.ltab{flex:1;padding:8px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;font-family:var(--fb);color:var(--tx2);transition:all var(--tr)}
+.ltab.active{background:var(--bg2);color:var(--tx);box-shadow:var(--sh)}
+.field{margin-bottom:1rem}
+.flabel{display:block;font-size:11.5px;font-weight:600;color:var(--tx2);margin-bottom:5px;font-family:var(--fm);letter-spacing:.04em;text-transform:uppercase}
+.finput{width:100%;background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;color:var(--tx);font-family:var(--fm);font-size:13.5px;outline:none;transition:all var(--tr)}
+.finput:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blueglow)}
+.finput::placeholder{color:var(--tx3)}
+.ferr{display:none;color:var(--red);font-size:12px;margin-top:6px;padding:7px 11px;border-radius:var(--rs);background:var(--reddim);border:1px solid rgba(239,68,68,.2)}
+.btn-login{width:100%;padding:12px;border-radius:var(--r);background:linear-gradient(135deg,var(--blue),var(--pur));color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all var(--trm);font-family:var(--fh);box-shadow:0 4px 16px var(--blueglow);margin-top:4px}
+.btn-login:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px var(--blueglow)}
+.btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.demo-hint{margin-top:1.2rem;padding:11px 14px;background:var(--bluedim);border:1px solid rgba(59,130,246,.2);border-radius:var(--r);font-size:12px;color:var(--tx2);font-family:var(--fm);line-height:2}
+.demo-hint strong{color:var(--blue)}
+
+/* CHAT LAYOUT */
+.chat-layout{display:grid;grid-template-columns:1fr 295px;height:calc(100vh - 58px);overflow:hidden}
+.chat-main{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.chat-msgs{flex:1;overflow-y:auto;padding:20px 20px 12px;display:flex;flex-direction:column;gap:16px}
+
+/* MESSAGES */
+.mrow{display:flex;gap:11px;animation:pgIn .2s ease}
+.mrow.mine{flex-direction:row-reverse}
+.mav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px}
+.mav-ai{background:linear-gradient(135deg,var(--blue),var(--pur))}
+.mav-s{background:linear-gradient(135deg,var(--grn),var(--cyn))}
+.mav-a{background:linear-gradient(135deg,var(--red),var(--amb))}
+.mbody{max-width:78%;display:flex;flex-direction:column;min-width:0}
+.mine .mbody{align-items:flex-end}
+.mbubble{padding:12px 16px;border-radius:var(--rl);font-size:14px;line-height:1.7;word-break:break-word;white-space:pre-wrap}
+.ai .mbubble{background:var(--bg3);border:1px solid var(--bd);border-bottom-left-radius:4px}
+.mine .mbubble{background:linear-gradient(135deg,var(--blue),var(--pur));color:#fff;border-bottom-right-radius:4px}
+.mtime{font-size:10.5px;color:var(--tx3);margin-top:5px;font-family:var(--fm)}
+.mine .mtime{text-align:right}
+.mextra{margin-top:9px;display:flex;flex-direction:column;gap:7px}
+.mactions{display:flex;gap:6px;flex-wrap:wrap}
+.mact{padding:4px 11px;border-radius:var(--rs);font-size:11.5px;font-weight:500;cursor:pointer;border:1px solid;transition:all var(--tr);font-family:var(--fb);display:flex;align-items:center;gap:4px}
+.ma-copy{background:var(--bluedim);border-color:rgba(59,130,246,.3);color:var(--blue)}
+.ma-dl{background:var(--grndim);border-color:rgba(16,185,129,.3);color:var(--grn)}
+.ma-speak{background:var(--purdim);border-color:rgba(139,92,246,.3);color:var(--pur)}
+.mact:hover{filter:brightness(1.2);transform:translateY(-1px)}
+.form-tag{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--rs);background:var(--grndim);border:1px solid rgba(16,185,129,.2);font-size:12.5px;color:var(--grn)}
+
+/* TYPING */
+.typing-row{display:flex;gap:11px}
+.typing-bubble{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rl);border-bottom-left-radius:4px;padding:12px 18px;display:flex;gap:5px;align-items:center}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:tdot 1.2s ease infinite}
+.tdot:nth-child(2){animation-delay:.18s}
+.tdot:nth-child(3){animation-delay:.36s}
+@keyframes tdot{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-5px);opacity:1}}
+
+/* INPUT BAR */
+.chat-bar{border-top:1px solid var(--bd);background:var(--bg2);padding:12px 16px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:3px 11px;border-radius:99px;font-size:12px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx2);cursor:pointer;transition:all var(--tr);white-space:nowrap;font-family:var(--fm)}
+.chip:hover{border-color:var(--blue);color:var(--blue);background:var(--bluedim)}
+.irow{display:flex;gap:8px;align-items:flex-end}
+.lseg{display:flex;border-radius:var(--rs);overflow:hidden;border:1px solid var(--bd);flex-shrink:0}
+.lbtn{padding:6px 10px;font-size:11px;font-weight:600;font-family:var(--fm);cursor:pointer;border:none;background:var(--bg3);color:var(--tx3);transition:all var(--tr);border-right:1px solid var(--bd)}
+.lbtn:last-child{border-right:none}
+.lbtn.active,.lbtn:hover{background:var(--bluedim);color:var(--blue)}
+.cta{flex:1;background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;font-size:14px;color:var(--tx);font-family:var(--fb);resize:none;min-height:44px;max-height:130px;transition:border-color var(--tr);outline:none;line-height:1.5}
+.cta:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blueglow)}
+.cta::placeholder{color:var(--tx3)}
+.sendbtn{width:44px;height:44px;border-radius:var(--r);background:linear-gradient(135deg,var(--blue),var(--pur));border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--trm);box-shadow:0 4px 12px var(--blueglow)}
+.sendbtn:hover:not(:disabled){transform:translateY(-1px) scale(1.05)}
+.sendbtn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.micbtn{width:44px;height:44px;border-radius:var(--r);background:var(--bg3);border:1px solid var(--bd);color:var(--tx2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--tr)}
+.micbtn:hover{border-color:var(--red);color:var(--red)}
+.micbtn.active{background:var(--reddim);border-color:var(--red);color:var(--red);animation:micpulse 1s ease infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)}}
+.optrow{display:flex;gap:8px;margin-top:8px}
+.optinput{flex:1;background:var(--bg4);border:1px solid var(--bd);border-radius:var(--rs);padding:7px 12px;color:var(--tx);font-family:var(--fm);font-size:12px;outline:none;transition:border-color var(--tr)}
+.optinput:focus{border-color:var(--blue)}
+.optinput::placeholder{color:var(--tx3)}
+
+/* AGENT SIDEBAR */
+.aside{border-left:1px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden}
+.aside-hd{padding:13px 15px;border-bottom:1px solid var(--bd);font-family:var(--fh);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.aside-badge{padding:2px 8px;border-radius:99px;font-size:10px;font-family:var(--fm);background:var(--bluedim);color:var(--blue)}
+.alist{padding:10px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.aitem{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r);border:1px solid transparent;transition:all .3s}
+.aitem.idle{background:var(--bg3);border-color:var(--bd)}
+.aitem.running{background:var(--ambdim);border-color:rgba(245,158,11,.3)}
+.aitem.done{background:var(--grndim);border-color:rgba(16,185,129,.25)}
+.aitem.error{background:var(--reddim);border-color:rgba(239,68,68,.3)}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.idle .adot{background:var(--tx4)}
+.running .adot{background:var(--amb);animation:blink .7s infinite}
+.done .adot{background:var(--grn)}
+.error .adot{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.aname{font-size:12.5px;font-weight:600;color:var(--tx);font-family:var(--fh)}
+.adesc{font-size:11px;color:var(--tx3);margin-top:2px;font-family:var(--fm)}
+.pipe-flow{margin-top:auto;padding:14px;border-top:1px solid var(--bd)}
+.pf-t{font-size:9.5px;font-weight:700;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;font-family:var(--fm)}
+.pf-s{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--tx2);font-family:var(--fm);padding:3px 0}
+.pf-a{color:var(--tx4);font-size:10px;padding-left:8px}
+
+/* DASHBOARD */
+.pg-hd{margin-bottom:1.6rem}
+.pg-hd h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;font-family:var(--fh)}
+.pg-hd p{color:var(--tx2);margin-top:3px;font-size:13.5px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;margin-bottom:1.5rem}
+.scard{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rl);padding:18px;transition:all var(--tr)}
+.scard:hover{border-color:var(--bd2);transform:translateY(-2px)}
+.semi{font-size:1.4rem;margin-bottom:10px}
+.sval{font-family:var(--fh);font-size:2rem;font-weight:800;line-height:1;letter-spacing:-.04em}
+.slbl{font-size:11.5px;color:var(--tx3);margin-top:6px;font-family:var(--fm);text-transform:uppercase;letter-spacing:.05em}
+.sbar{height:3px;border-radius:2px;background:var(--bgh);margin-top:10px;overflow:hidden}
+.sbarfill{height:100%;border-radius:2px;transition:width 1s ease}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rl);padding:18px}
+.ctitle{font-family:var(--fh);font-size:13.5px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}
+.alert{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;border-radius:var(--r);font-size:13px;line-height:1.5;margin-bottom:8px}
+.awarn{background:var(--ambdim);border:1px solid rgba(245,158,11,.25);color:var(--amb)}
+.adanger{background:var(--reddim);border:1px solid rgba(239,68,68,.25);color:var(--red)}
+.agood{background:var(--grndim);border:1px solid rgba(16,185,129,.25);color:var(--grn)}
+.ainfo{background:var(--bluedim);border:1px solid rgba(59,130,246,.25);color:var(--blue)}
+
+/* DEADLINES */
+.dlitem{display:flex;align-items:center;gap:13px;padding:11px 13px;background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;transition:border-color var(--tr)}
+.dlitem.urgent{border-color:rgba(239,68,68,.35);background:var(--reddim)}
+.dlitem:hover{border-color:var(--bd2)}
+.dldate{min-width:48px;background:var(--bgh);border-radius:var(--rs);padding:6px 8px;text-align:center;flex-shrink:0}
+.dldate .mon{font-size:9px;text-transform:uppercase;color:var(--tx3);font-family:var(--fm);font-weight:700;letter-spacing:.08em}
+.dldate .day{font-family:var(--fh);font-size:1.3rem;font-weight:800;line-height:1}
+.dlinfo .dlt{font-weight:600;font-size:13px}
+.dlinfo .dls{font-size:11px;color:var(--tx3);font-family:var(--fm);margin-top:2px}
+.utag{margin-left:auto;padding:2px 8px;border-radius:99px;font-size:9.5px;font-weight:700;font-family:var(--fm);background:var(--reddim);color:var(--red);flex-shrink:0;text-transform:uppercase}
+
+/* NOTICES */
+.ncard{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:8px}
+.ncard.high{border-color:rgba(245,158,11,.35)}
+.nt{font-weight:600;font-size:13px;margin-bottom:5px}
+.nb{font-size:12.5px;color:var(--tx2);line-height:1.55}
+.nm{font-size:10.5px;color:var(--tx3);margin-top:7px;font-family:var(--fm)}
+
+/* PROFILE */
+.prolayout{display:grid;grid-template-columns:270px 1fr;gap:16px;align-items:start}
+.procard{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rxl);padding:22px;position:sticky;top:74px;text-align:center}
+.proav{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--pur));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:1.5rem;font-weight:800;color:#fff;margin:0 auto 14px;box-shadow:0 0 0 4px var(--bluedim)}
+.proname{font-family:var(--fh);font-size:1.15rem;font-weight:700}
+.proid{font-family:var(--fm);font-size:11px;color:var(--tx3);margin-top:3px}
+.prodept{font-size:12.5px;color:var(--blue);margin-top:4px;font-weight:500}
+.minigrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.ministat{background:var(--bg4);border-radius:var(--rs);padding:10px;text-align:center}
+.ministat .val{font-family:var(--fh);font-size:1.3rem;font-weight:700;line-height:1}
+.ministat .lbl{font-size:10px;color:var(--tx3);font-family:var(--fm);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.progs{margin-top:16px;text-align:left}
+.progrow{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--tx2)}
+.progt{height:5px;background:var(--bgh);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.progf{height:100%;border-radius:3px;transition:width 1s ease}
+.irow2{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.irow2:last-child{border-bottom:none}
+.ilbl{color:var(--tx2)}
+.ival{font-weight:500;font-family:var(--fm);font-size:12.5px}
+
+/* HISTORY */
+.hitem{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rl);padding:14px 16px;margin-bottom:9px;cursor:pointer;transition:all var(--tr)}
+.hitem:hover{border-color:var(--bd2);transform:translateY(-1px)}
+.hitop{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.hiq{font-weight:600;font-size:13.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hire{font-size:12.5px;color:var(--tx2);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hifoot{display:flex;gap:10px;align-items:center;margin-top:7px;font-size:11px;color:var(--tx3);font-family:var(--fm);flex-wrap:wrap}
+
+/* TICKETS */
+.tkcard{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rl);padding:15px 17px;margin-bottom:10px;transition:border-color var(--tr)}
+.tkcard:hover{border-color:var(--bd2)}
+.tkhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.tkid{font-family:var(--fm);font-size:11px;color:var(--blue)}
+.tkbadges{display:flex;gap:5px}
+.tksub{font-weight:600;font-size:13.5px;margin-bottom:4px}
+.tkmeta{font-size:12px;color:var(--tx3);font-family:var(--fm)}
+.tkdesc{font-size:12.5px;color:var(--tx2);line-height:1.5;margin-top:7px}
+.tkres{margin-top:9px;padding:8px 12px;background:var(--grndim);border:1px solid rgba(16,185,129,.2);border-radius:var(--rs);font-size:12px;color:var(--grn)}
+
+/* BADGES */
+.badge{padding:2px 9px;border-radius:99px;font-size:10.5px;font-family:var(--fm);font-weight:600;display:inline-flex;align-items:center}
+.b-open{background:var(--reddim);color:var(--red)}
+.b-resolved{background:var(--grndim);color:var(--grn)}
+.b-in_progress{background:var(--ambdim);color:var(--amb)}
+.b-closed{background:var(--bgh);color:var(--tx3)}
+.b-low{background:var(--grndim);color:var(--grn)}
+.b-medium{background:var(--bluedim);color:var(--blue)}
+.b-high{background:var(--ambdim);color:var(--amb)}
+.b-critical{background:var(--reddim);color:var(--red)}
+
+/* POLICIES */
+.polgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.polcard{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rl);padding:16px;transition:all var(--tr)}
+.polcard:hover{border-color:var(--bd2);transform:translateY(-2px);box-shadow:var(--shm)}
+.policon{width:44px;height:44px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:11px}
+.pi-exam{background:var(--bluedim)}.pi-admin{background:var(--ambdim)}.pi-placement{background:var(--grndim)}.pi-general{background:var(--purdim)}
+.polname{font-weight:600;font-size:13px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--fm)}
+.poldesc{font-size:12px;color:var(--tx2);line-height:1.5;margin-bottom:10px}
+.polfoot{display:flex;align-items:center;justify-content:space-between}
+.poltag{font-size:10px;font-family:var(--fm);padding:2px 8px;border-radius:4px;background:var(--bgh);border:1px solid var(--bd);color:var(--tx3)}
+
+/* ANALYTICS */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.barrow{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.barlbl{min-width:130px;font-size:12.5px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bart{flex:1;height:7px;background:var(--bgh);border-radius:4px;overflow:hidden}
+.barf{height:100%;border-radius:4px;transition:width .9s ease}
+.barcnt{min-width:28px;text-align:right;font-family:var(--fm);font-size:11px;color:var(--tx3)}
+.daycols{display:flex;align-items:flex-end;gap:5px;height:90px}
+.daycol{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.daycol-bar{width:100%;border-radius:4px 4px 0 0;background:var(--blue);opacity:.8;transition:height .7s ease}
+.daycol-lbl{font-size:9px;color:var(--tx3);font-family:var(--fm)}
+
+/* ADMIN */
+.atabs{display:flex;gap:5px;margin-bottom:1.5rem;flex-wrap:wrap}
+.atab{padding:7px 16px;border-radius:var(--r);font-size:13px;font-weight:500;color:var(--tx2);cursor:pointer;border:1px solid var(--bd);background:var(--bg3);transition:all var(--tr);font-family:var(--fb);display:flex;align-items:center;gap:6px}
+.atab:hover{color:var(--tx);border-color:var(--bd2)}
+.atab.active{color:var(--blue);background:var(--bluedim);border-color:rgba(59,130,246,.3)}
+
+/* TABLE */
+.twrap{overflow-x:auto;border:1px solid var(--bd);border-radius:var(--rl);background:var(--bg3)}
+.dtable{width:100%;border-collapse:collapse;font-size:13px}
+.dtable th{padding:11px 15px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);border-bottom:1px solid var(--bd);background:var(--bg4);font-family:var(--fm);white-space:nowrap}
+.dtable td{padding:12px 15px;border-bottom:1px solid var(--bd);color:var(--tx2);vertical-align:middle}
+.dtable tr:last-child td{border-bottom:none}
+.dtable tr:hover td{background:var(--bgh);color:var(--tx)}
+
+/* MODAL */
+.moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:1rem}
+.moverlay.open{display:flex}
+.mbox{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--rxl);width:min(580px,100%);max-height:88vh;display:flex;flex-direction:column;box-shadow:var(--shl);animation:pgIn .2s ease}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:15px 20px;border-bottom:1px solid var(--bd);font-family:var(--fh);font-size:1rem;font-weight:700}
+.mclose{background:none;border:none;color:var(--tx3);font-size:20px;cursor:pointer;line-height:1;transition:color var(--tr)}
+.mclose:hover{color:var(--tx)}
+.mbdy{overflow-y:auto;padding:20px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld.full{grid-column:1/-1}
+.flbl2{font-size:11px;font-weight:700;color:var(--tx3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em}
+.finp2{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 12px;color:var(--tx);font-family:var(--fm);font-size:13px;outline:none;width:100%;transition:border-color var(--tr)}
+.finp2:focus{border-color:var(--blue);box-shadow:0 0 0 2px var(--blueglow)}
+.finp2::placeholder{color:var(--tx3)}
+.mfoot{display:flex;gap:9px;padding-top:1.2rem}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all var(--tr);font-family:var(--fb);white-space:nowrap}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-p{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 3px 10px var(--blueglow)}
+.btn-p:hover{background:#2563eb;transform:translateY(-1px)}
+.btn-g{background:var(--bg3);color:var(--tx2);border-color:var(--bd)}
+.btn-g:hover{border-color:var(--bd2);color:var(--tx)}
+.btn-d{background:var(--reddim);color:var(--red);border-color:rgba(239,68,68,.3)}
+.btn-d:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.w-full{width:100%}
+
+/* TOOLS */
+.toolsec{display:none}
+.toolsec.active{display:block}
+
+/* SKELETON LOADER */
+.skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:skelanim 1.5s ease infinite;border-radius:var(--rs)}
+@keyframes skelanim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-card{height:110px;border-radius:var(--rl);margin-bottom:12px}
+.skel-line{height:14px;margin-bottom:8px}
+.skel-line.short{width:60%}
+
+/* TOAST */
+.twrap2{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:7px}
+.toast{display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:var(--rl);background:var(--bg2);border:1px solid var(--bd2);font-size:13.5px;box-shadow:var(--shm);animation:pgIn .22s ease;max-width:340px;font-weight:500}
+.toast.ok{border-color:rgba(16,185,129,.4);color:var(--grn)}
+.toast.err{border-color:rgba(239,68,68,.4);color:var(--red)}
+.toast.info{border-color:rgba(59,130,246,.4);color:var(--blue)}
+
+/* UTILITIES */
+.empty{text-align:center;padding:3.5rem 2rem;color:var(--tx3)}
+.ei{font-size:2.8rem;display:block;margin-bottom:.8rem}
+.flex{display:flex}.fc{flex-direction:column}.aic{align-items:center}.jb{justify-content:space-between}
+.gap6{gap:6px}.gap8{gap:8px}.gap12{gap:12px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}
+.fw6{font-weight:600}.fw7{font-weight:700}
+.mono{font-family:var(--fm)}
+.cblue{color:var(--blue)}.cgrn{color:var(--grn)}.cred{color:var(--red)}.camb{color:var(--amb)}.cmut{color:var(--tx3)}.csec{color:var(--tx2)}
+.trunc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* NOTIFICATION BELL */
+.notif-btn{position:relative}
+.notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--bg2)}
+
+/* SESSION TIMEOUT */
+.session-warn{position:fixed;bottom:5rem;right:1.5rem;z-index:9998;background:var(--bg2);border:1px solid rgba(245,158,11,.4);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--shm);font-size:13px;color:var(--amb);display:none;animation:pgIn .3s ease;max-width:300px}
+.session-warn.show{display:block}
+
+/* RESPONSIVE */
+@media(max-width:900px){.chat-layout{grid-template-columns:1fr}.aside{display:none}}
+@media(max-width:720px){
+  .prolayout{grid-template-columns:1fr}.procard{position:static}
+  .g2,.g3{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}
+  .container{padding:1.2rem 1rem}.navbar{padding:0 1rem}
+  .nav-div{display:none}.nav-tab{padding:5px 8px;font-size:11.5px}
+  .sgrid{grid-template-columns:repeat(2,1fr)}
+  .status-pill span{display:none}
+}
+@media(max-width:480px){.sgrid{grid-template-columns:1fr}.login-card{padding:1.6rem 1.2rem}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-logo" href="#" onclick="return false">
+    <div class="nav-logo-box">🎓</div>CampusAI
+  </a>
+  <div class="nav-div"></div>
+  <div class="nav-tabs" id="nav-main" style="display:none">
+    <button class="nav-tab" data-page="chat"      onclick="showPage('chat')">💬 Chat</button>
+    <button class="nav-tab" data-page="dashboard" onclick="showPage('dashboard')">🏠 Dashboard</button>
+    <button class="nav-tab" data-page="history"   onclick="showPage('history')">🕐 History</button>
+    <button class="nav-tab" data-page="profile"   onclick="showPage('profile')">👤 Profile</button>
+    <button class="nav-tab" data-page="tickets"   onclick="showPage('tickets')">🎫 Tickets</button>
+    <button class="nav-tab" data-page="policies"  onclick="showPage('policies')">📋 Policies</button>
+    <button class="nav-tab" data-page="analytics" onclick="showPage('analytics')">📊 Analytics</button>
+    <button class="nav-tab" data-page="tools"     onclick="showPage('tools')">🛠️ Tools</button>
+    <button class="nav-tab flex aic gap6" data-page="admin" id="tab-admin" onclick="showPage('admin')" style="display:none">⚙️ Admin</button>
+  </div>
+  <div class="nav-right">
+    <div class="status-pill"><div class="sdot" id="sdot"></div><span id="stxt">Connecting…</span></div>
+    <button class="icon-btn notif-btn" id="notif-btn" onclick="toggleNotifs()" title="Notifications" style="display:none">
+      🔔<span class="notif-dot" id="notif-dot" style="display:none"></span>
+    </button>
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <div class="user-chip" id="user-chip" style="display:none" onclick="showPage('profile')">
+      <div class="uav uav-s" id="nav-av">?</div>
+      <span class="uname" id="nav-uname">User</span>
+      <span class="rtag rt-s" id="nav-rtag">student</span>
+    </div>
+    <button class="icon-btn" id="logout-btn" style="display:none" onclick="logout()" title="Logout">⬅️</button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div class="page active" id="pg-login">
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-icon">🎓</div>
+      <div class="login-title">CampusAI v7.0</div>
+      <div class="login-sub">Autonomous 5-Agent College Administration System</div>
+      <div class="login-tabs">
+        <button class="ltab active" id="ltab-student" onclick="setLType('student')">🎓 Student</button>
+        <button class="ltab"        id="ltab-admin"   onclick="setLType('admin')">⚙️ Admin</button>
+      </div>
+      <div class="field">
+        <label class="flabel" id="l-label">Student ID</label>
+        <input class="finput" id="l-id" placeholder="e.g. S001" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="field">
+        <label class="flabel">Password</label>
+        <input class="finput" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="ferr" id="l-err"></div>
+      <button class="btn-login" id="l-btn" onclick="doLogin()">Login →</button>
+      <div class="demo-hint" id="demo-hint">🎓 Demo: <strong>S001/pass123</strong> (Arjun) · <strong>S002/pass123</strong> (Priya) · <strong>S003/pass123</strong> (Rohan)</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="page" id="pg-chat">
+  <div class="chat-layout">
+    <div class="chat-main">
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="mrow ai">
+          <div class="mav mav-ai">🤖</div>
+          <div class="mbody">
+            <div class="mbubble">
+              <strong>Namaste! 🎓 Welcome to CampusAI v7.0</strong>
+
+I'm your smart college assistant powered by 5 AI Agents!
+
+Ask me ANYTHING — college queries or general questions:
+📋 Exam &amp; ATKT · 💰 Fees · 📅 Attendance · 💼 Placement
+💡 General Knowledge · 😄 Jokes · 🧮 Math · 💻 Coding
+
+Speak in English, Gujarati, or Hinglish!
+            </div>
+            <div class="mtime">Just now</div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-bar">
+        <div class="chips" id="chips"></div>
+        <div class="irow">
+          <div class="lseg">
+            <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+            <button class="lbtn"        data-lang="gu" onclick="setLang('gu')">GU</button>
+            <button class="lbtn"        data-lang="hi" onclick="setLang('hi')">HI</button>
+          </div>
+          <button class="micbtn" id="mic-btn" onclick="toggleMic()">🎙️</button>
+          <textarea class="cta" id="c-input" rows="1" placeholder="Ask anything — college, general knowledge, jokes…"></textarea>
+          <button class="sendbtn" id="send-btn" onclick="sendMsg()">➤</button>
+        </div>
+        <div class="optrow">
+          <input class="optinput" id="c-email" type="email" placeholder="📧 Email (optional)"/>
+          <input class="optinput" id="c-name"  placeholder="👤 Name (optional)" style="max-width:190px"/>
+        </div>
+      </div>
+    </div>
+    <div class="aside">
+      <div class="aside-hd">🛡️ Agent Pipeline <span class="aside-badge">5 Agents</span></div>
+      <div class="alist" id="alist"></div>
+      <div class="pipe-flow">
+        <div class="pf-t">Pipeline Flow</div>
+        <div class="pf-s">🔍 Query Understanding</div>
+        <div class="pf-a">↓ language + intent</div>
+        <div class="pf-s">📚 Policy Agent</div>
+        <div class="pf-a">↓ FAISS + BM25</div>
+        <div class="pf-s">⚖️ Decision Agent</div>
+        <div class="pf-a">↓ rules applied</div>
+        <div class="pf-s">⚡ Action Agent</div>
+        <div class="pf-a">↓ response built</div>
+        <div class="pf-s">🛡️ Supervisor</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page" id="pg-dashboard">
+  <div class="container">
+    <div class="pg-hd"><h1>👋 Welcome, <span id="dash-name">User</span>!</h1><p>Your college at a glance</p></div>
+    <div class="sgrid" id="dash-stats"></div>
+    <div id="dash-alerts"></div>
+    <div class="g2" style="margin-top:1.2rem">
+      <div><div class="ctitle mb12">📅 Upcoming Deadlines</div><div id="dash-deadlines"><div class="empty"><span class="ei">📅</span><p>Loading…</p></div></div></div>
+      <div><div class="ctitle mb12">📢 College Notices</div><div id="dash-notices"><div class="empty"><span class="ei">📢</span><p>Loading…</p></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="page" id="pg-history">
+  <div class="container">
+    <div class="pg-hd flex jb aic">
+      <div><h1>🕐 Chat History</h1><p>All your previous queries</p></div>
+      <button class="btn btn-g btn-sm" onclick="loadHistory()">🔄 Refresh</button>
+    </div>
+    <div id="history-list"><div class="empty"><span class="ei">🕐</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="pg-profile">
+  <div class="container">
+    <div class="pg-hd"><h1>👤 My Profile</h1><p>Academic information and status</p></div>
+    <div id="profile-content"></div>
+  </div>
+</div>
+
+<!-- TICKETS -->
+<div class="page" id="pg-tickets">
+  <div class="container">
+    <div class="pg-hd flex jb aic">
+      <div><h1>🎫 My Tickets</h1><p>Support and complaint tickets</p></div>
+      <button class="btn btn-p btn-sm" onclick="showNewTicket()">+ New Ticket</button>
+    </div>
+    <div id="tickets-list"><div class="empty"><span class="ei">🎫</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- POLICIES -->
+<div class="page" id="pg-policies">
+  <div class="container">
+    <div class="flex jb aic mb16">
+      <div class="pg-hd" style="margin-bottom:0"><h1>📋 Policy Knowledge Base</h1><p>Hybrid FAISS + BM25 retrieval</p></div>
+      <button class="btn btn-g" onclick="reindex()">🔄 Re-index</button>
+    </div>
+    <div class="polgrid" id="polgrid"><div class="empty"><span class="ei">📂</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="page" id="pg-analytics">
+  <div class="container">
+    <div class="pg-hd"><h1>📊 Analytics</h1><p>Query patterns, languages, system insights</p></div>
+    <div id="analytics-content"><div class="empty"><span class="ei">📊</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- TOOLS -->
+<div class="page" id="pg-tools">
+  <div class="container">
+    <div class="pg-hd"><h1>🛠️ Tools Panel</h1><p>Health monitor, policy ingest, email test, CLI tester, trace viewer</p></div>
+    <div class="atabs">
+      <button class="atab active" data-atab="health" onclick="switchToolTab('health')">💚 Health</button>
+      <button class="atab" data-atab="ingest"        onclick="switchToolTab('ingest')">📥 Ingest</button>
+      <button class="atab" data-atab="email"         onclick="switchToolTab('email')">📧 Email</button>
+      <button class="atab" data-atab="cli"           onclick="switchToolTab('cli')">💻 CLI Test</button>
+      <button class="atab" data-atab="traces"        onclick="switchToolTab('traces')">🔍 Traces</button>
+    </div>
+    <div class="toolsec active" id="ts-health">
+      <div class="g2">
+        <div class="card">
+          <div class="ctitle">💚 Server Status</div>
+          <div id="health-content"><div class="empty"><span class="ei">⌛</span><p>Loading…</p></div></div>
+          <button class="btn btn-g w-full mt12" onclick="loadHealth()">🔄 Refresh</button>
+        </div>
+        <div class="card">
+          <div class="ctitle">🤖 Pipeline Info</div>
+          <div class="irow2"><span class="ilbl">Total Agents</span><span class="ival cblue fw6">5</span></div>
+          <div class="irow2"><span class="ilbl">Vector DB</span><span class="ival">FAISS (local)</span></div>
+          <div class="irow2"><span class="ilbl">Search</span><span class="ival">FAISS + BM25 hybrid</span></div>
+          <div class="irow2"><span class="ilbl">Embedding</span><span class="ival mono">all-MiniLM-L6-v2</span></div>
+          <div class="irow2"><span class="ilbl">Database</span><span class="ival">SQLite</span></div>
+          <div class="irow2"><span class="ilbl">General QA</span><span class="ival cgrn">✅ Enabled</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="toolsec" id="ts-ingest">
+      <div class="g2">
+        <div class="card">
+          <div class="ctitle">📥 Re-Index Policies</div>
+          <p class="csec" style="font-size:13px;line-height:1.7;margin-bottom:1rem">Place <code style="color:var(--blue)">.txt</code> or <code style="color:var(--blue)">.pdf</code> in <code style="color:var(--blue)">data/policies/</code> then click below.</p>
+          <div class="alert awarn mb12">⚠️ Takes ~30 seconds. API stays live during indexing.</div>
+          <button class="btn btn-p w-full" id="ingest-btn" onclick="toolIngest()">🔄 Start Re-Indexing</button>
+          <div id="ingest-status" class="mt12"></div>
+        </div>
+        <div class="card"><div class="ctitle">📂 Policy Files</div><div id="tool-pols"><div class="empty"><span class="ei">⌛</span><p>Loading…</p></div></div></div>
+      </div>
+    </div>
+    <div class="toolsec" id="ts-email">
+      <div class="g2">
+        <div class="card">
+          <div class="ctitle">📧 Test Email Tool</div>
+          <div class="fld mb12"><label class="flbl2">To Email</label><input class="finp2" id="te-to" type="email" placeholder="student@example.com"/></div>
+          <div class="fld mb12"><label class="flbl2">Subject</label><input class="finp2" id="te-sub" value="Test from CampusAI v7.0"/></div>
+          <div class="fld mb16"><label class="flbl2">Message</label><textarea class="finp2" id="te-body" rows="4" style="resize:vertical">Hello! This is a test from CampusAI v7.0.</textarea></div>
+          <button class="btn btn-p w-full" id="email-btn" onclick="toolSendEmail()">📤 Send Test</button>
+          <div id="email-status" class="mt12"></div>
+        </div>
+        <div class="card">
+          <div class="ctitle">⚙️ SMTP Config</div>
+          <div class="alert awarn mb12">Set these in your <strong>.env</strong> file</div>
+          <div style="background:var(--bg4);border-radius:var(--r);padding:14px;font-family:var(--fm);font-size:12px;color:var(--tx2);line-height:2.2">SMTP_HOST=smtp.gmail.com<br/>SMTP_PORT=587<br/>SMTP_USER=your@gmail.com<br/>SMTP_PASS=xxxx xxxx xxxx xxxx</div>
+        </div>
+      </div>
+    </div>
+    <div class="toolsec" id="ts-cli">
+      <div class="card">
+        <div class="ctitle">💻 Pipeline CLI Tester</div>
+        <p class="csec" style="font-size:13px;margin-bottom:1rem">Test the full 5-agent pipeline and see every execution detail.</p>
+        <div class="fld mb8"><label class="flbl2">Query</label><input class="finp2" id="cli-q" placeholder="e.g. Am I eligible for ATKT? or What is photosynthesis?" onkeydown="if(event.key==='Enter')toolRunQuery()"/></div>
+        <div class="flex gap8 mb12"><input class="finp2" id="cli-email" type="email" placeholder="Email (optional)" style="flex:1"/><input class="finp2" id="cli-name" placeholder="Name (optional)" style="max-width:200px"/></div>
+        <div class="chips" id="cli-chips"></div>
+        <button class="btn btn-p mt8" id="cli-btn" onclick="toolRunQuery()">▶ Run Pipeline</button>
+        <div id="cli-result" class="mt16"></div>
+      </div>
+    </div>
+    <div class="toolsec" id="ts-traces">
+      <div class="card">
+        <div class="ctitle">🔍 Query Traces <button class="btn btn-g btn-sm" onclick="loadTraces()" style="margin-left:auto">🔄 Refresh</button></div>
+        <div id="traces-list"><div class="empty"><span class="ei">🔍</span><p>No traces yet. Run a query first!</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="pg-admin">
+  <div class="container">
+    <div class="pg-hd"><h1>⚙️ Admin Panel</h1><p>Manage students, tickets, notices and all queries</p></div>
+    <div class="atabs">
+      <button class="atab active" data-atab="students" onclick="switchAdminTab('students')">👥 Students</button>
+      <button class="atab" data-atab="tickets"         onclick="switchAdminTab('tickets')">🎫 Tickets</button>
+      <button class="atab" data-atab="queries"         onclick="switchAdminTab('queries')">💬 Queries</button>
+      <button class="atab" data-atab="notices"         onclick="switchAdminTab('notices')">📢 Notices</button>
+    </div>
+    <div class="admin-sec" id="as-students">
+      <div class="flex jb aic mb16"><div class="fw6">All Students</div><button class="btn btn-p" onclick="showAddStudent()">+ Add Student</button></div>
+      <div class="twrap">
+        <table class="dtable">
+          <thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Sem</th><th>CGPA</th><th>Backlogs</th><th>Attendance</th><th>Fees Due</th><th>Actions</th></tr></thead>
+          <tbody id="admin-tbody"><tr><td colspan="9" style="text-align:center;padding:24px;color:var(--tx3)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="admin-sec" id="as-tickets" style="display:none">
+      <div id="admin-tklist"><div class="empty"><span class="ei">🎫</span><p>Loading…</p></div></div>
+    </div>
+    <div class="admin-sec" id="as-queries" style="display:none">
+      <div id="admin-qlist"><div class="empty"><span class="ei">💬</span><p>Loading…</p></div></div>
+    </div>
+    <div class="admin-sec" id="as-notices" style="display:none">
+      <div class="flex jb aic mb16"><div class="fw6">Notices</div><button class="btn btn-p" onclick="showPostNotice()">+ Post Notice</button></div>
+      <div id="admin-nlist"><div class="empty"><span class="ei">📢</span><p>Loading…</p></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- MODAL: ADD STUDENT -->
+<div class="moverlay" id="modal-student">
+  <div class="mbox">
+    <div class="mhead">➕ Add New Student <button class="mclose" onclick="hideAddStudent()">✕</button></div>
+    <div class="mbdy"><form id="form-student">
+      <div class="fgrid">
+        <div class="fld"><label class="flbl2">ID *</label><input class="finp2" id="ns-id" placeholder="S006" required/></div>
+        <div class="fld"><label class="flbl2">Name *</label><input class="finp2" id="ns-name" required/></div>
+        <div class="fld"><label class="flbl2">Email *</label><input class="finp2" id="ns-email" type="email" required/></div>
+        <div class="fld"><label class="flbl2">Password *</label><input class="finp2" id="ns-pass" required/></div>
+        <div class="fld"><label class="flbl2">Department</label>
+          <select class="finp2" id="ns-dept"><option>Computer Science</option><option>Electronics</option><option>Mechanical</option><option>Civil</option><option>Information Technology</option></select>
+        </div>
+        <div class="fld"><label class="flbl2">Semester</label><input class="finp2" id="ns-sem" type="number" min="1" max="8" value="1"/></div>
+        <div class="fld"><label class="flbl2">CGPA</label><input class="finp2" id="ns-cgpa" type="number" step="0.1" value="0"/></div>
+        <div class="fld"><label class="flbl2">Attendance %</label><input class="finp2" id="ns-att" type="number" value="75"/></div>
+        <div class="fld"><label class="flbl2">Fees Due (₹)</label><input class="finp2" id="ns-fdue" type="number" value="0"/></div>
+        <div class="fld"><label class="flbl2">Backlogs</label><input class="finp2" id="ns-back" type="number" value="0"/></div>
+        <div class="fld full"><label class="flbl2">Phone</label><input class="finp2" id="ns-phone"/></div>
+      </div>
+      <div class="mfoot">
+        <button type="button" class="btn btn-p" onclick="submitAddStudent()">Add Student</button>
+        <button type="button" class="btn btn-g" onclick="hideAddStudent()">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT STUDENT -->
+<div class="moverlay" id="modal-edit-student">
+  <div class="mbox">
+    <div class="mhead">✏️ Edit Student <button class="mclose" onclick="hideEditStudent()">✕</button></div>
+    <div class="mbdy"><form id="form-edit-student">
+      <div class="fgrid">
+        <div class="fld"><label class="flbl2">Name</label><input class="finp2" id="es-name"/></div>
+        <div class="fld"><label class="flbl2">Email</label><input class="finp2" id="es-email" type="email"/></div>
+        <div class="fld"><label class="flbl2">Department</label>
+          <select class="finp2" id="es-dept"><option>Computer Science</option><option>Electronics</option><option>Mechanical</option><option>Civil</option><option>Information Technology</option></select>
+        </div>
+        <div class="fld"><label class="flbl2">Semester</label><input class="finp2" id="es-sem" type="number" min="1" max="8"/></div>
+        <div class="fld"><label class="flbl2">CGPA</label><input class="finp2" id="es-cgpa" type="number" step="0.1"/></div>
+        <div class="fld"><label class="flbl2">Attendance %</label><input class="finp2" id="es-att" type="number"/></div>
+        <div class="fld"><label class="flbl2">Fees Due (₹)</label><input class="finp2" id="es-fdue" type="number"/></div>
+        <div class="fld"><label class="flbl2">Backlogs</label><input class="finp2" id="es-back" type="number"/></div>
+        <div class="fld full"><label class="flbl2">Phone</label><input class="finp2" id="es-phone"/></div>
+      </div>
+      <div class="mfoot">
+        <button type="button" class="btn btn-p" onclick="submitEditStudent()">Save Changes</button>
+        <button type="button" class="btn btn-g" onclick="hideEditStudent()">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+</div>
+
+<!-- MODAL: POST NOTICE -->
+<div class="moverlay" id="modal-notice">
+  <div class="mbox">
+    <div class="mhead">📢 Post Notice <button class="mclose" onclick="hidePostNotice()">✕</button></div>
+    <div class="mbdy"><form id="form-notice">
+      <div class="fld mb12"><label class="flbl2">Title *</label><input class="finp2" id="n-title" required/></div>
+      <div class="fld mb12"><label class="flbl2">Content *</label><textarea class="finp2" id="n-content" rows="4" style="resize:vertical" required></textarea></div>
+      <div class="fgrid">
+        <div class="fld"><label class="flbl2">Department</label><input class="finp2" id="n-dept" placeholder="All Departments"/></div>
+        <div class="fld"><label class="flbl2">Priority</label><select class="finp2" id="n-priority"><option value="normal">Normal</option><option value="high">High</option></select></div>
+      </div>
+      <div class="mfoot">
+        <button type="button" class="btn btn-p" onclick="submitNotice()">Post Notice</button>
+        <button type="button" class="btn btn-g" onclick="hidePostNotice()">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+</div>
+
+<!-- MODAL: NEW TICKET -->
+<div class="moverlay" id="modal-new-ticket">
+  <div class="mbox">
+    <div class="mhead">🎫 New Support Ticket <button class="mclose" onclick="hideNewTicket()">✕</button></div>
+    <div class="mbdy"><form id="form-new-ticket">
+      <div class="fld mb12"><label class="flbl2">Subject *</label><input class="finp2" id="nt-sub" required/></div>
+      <div class="fld mb12"><label class="flbl2">Description *</label><textarea class="finp2" id="nt-desc" rows="4" style="resize:vertical" required></textarea></div>
+      <div class="fgrid">
+        <div class="fld"><label class="flbl2">Department</label>
+          <select class="finp2" id="nt-dept"><option>Admin</option><option>Accounts</option><option>Examination</option><option>Academic</option><option>Placement</option></select>
+        </div>
+        <div class="fld"><label class="flbl2">Priority</label>
+          <select class="finp2" id="nt-pri"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select>
+        </div>
+      </div>
+      <div class="mfoot">
+        <button type="button" class="btn btn-p" onclick="submitNewTicket()">Submit Ticket</button>
+        <button type="button" class="btn btn-g" onclick="hideNewTicket()">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS PANEL -->
+<div class="moverlay" id="modal-notifs">
+  <div class="mbox" style="max-width:420px">
+    <div class="mhead">🔔 Notifications <button class="mclose" onclick="hideNotifs()">✕</button></div>
+    <div class="mbdy" id="notifs-content"><div class="empty"><span class="ei">🔔</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- SESSION TIMEOUT WARNING -->
+<div class="session-warn" id="session-warn">
+  ⏰ Session expiring in <strong id="session-countdown">5:00</strong>
+  <button class="btn btn-p btn-sm" style="margin-left:10px" onclick="extendSession()">Stay Logged In</button>
+</div>
+
+<div class="twrap2" id="toast-wrap"></div>
+
+<script>
+'use strict';
+
+const App = {
+  user: null, userType: null,
+  lang: 'en', theme: localStorage.getItem('cam-theme')||'dark',
+  speaking: false, mic: null, busy: false,
+  stageTimer: null, stageIdx: 0,
+  msgData: {},
+  sessionTimer: null, sessionWarning: null, sessionSecs: 1800,
+  editingStudentId: null,
+};
+
+const AGENTS = [
+  {id:'query',     icon:'🔍', name:'Query Agent',     desc:'Language + intent'},
+  {id:'policy',    icon:'📚', name:'Policy Agent',    desc:'FAISS + BM25 search'},
+  {id:'decision',  icon:'⚖️',  name:'Decision Agent',  desc:'Apply policy rules'},
+  {id:'action',    icon:'⚡',  name:'Action Agent',    desc:'Generate response'},
+  {id:'supervisor',icon:'🛡️', name:'Supervisor',      desc:'Validate + approve'},
+];
+
+const CHIPS = {
+  en:['ATKT eligibility?','Fee deadline?','Hall ticket?','Attendance %?','Placement criteria?','Tell me a joke!','What is Python?','Motivate me!'],
+  gu:['ATKT mate eligible chhu?','Fees ni tarikh?','Hall ticket kyare?','Attendance policy?','Ek joke kaho!','Python su chhe?'],
+  hi:['ATKT ke liye eligible hun?','Fees kab bharna?','Hall ticket kab?','Ek joke sunao!','Python kya hai?'],
+};
+
+const OUTCOME_ICON = {allowed:'✅',not_allowed:'❌',conditional:'⚠️',insufficient_info:'ℹ️'};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmt = () => new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+const fmtD = iso => { try{return new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch{return '';} };
+const fmtDT = iso => { try{return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return '';} };
+
+async function api(path, method='GET', body=null) {
+  const opts = {method, headers:{'Content-Type':'application/json'}};
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(path, opts);
+  if (!r.ok) {
+    const e = await r.json().catch(()=>({detail:'Server error'}));
+    throw new Error(e.detail||`Error ${r.status}`);
+  }
+  return r.json();
+}
+
+// TOAST
+function toast(msg, type='info') {
+  const w = $('toast-wrap');
+  const t = document.createElement('div');
+  const ic = type==='ok'?'✓':type==='err'?'✕':'ℹ';
+  t.className = `toast ${type}`;
+  t.innerHTML = `${ic} ${esc(msg)}`;
+  w.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='.3s'; setTimeout(()=>t.remove(),300); }, 3500);
+}
+
+// THEME
+function applyTheme() {
+  document.body.classList.toggle('light', App.theme==='light');
+  const b=$('theme-btn'); if(b) b.textContent=App.theme==='dark'?'🌙':'☀️';
+}
+function toggleTheme() {
+  App.theme=App.theme==='dark'?'light':'dark';
+  localStorage.setItem('cam-theme',App.theme); applyTheme();
+}
+
+// SESSION MANAGEMENT
+function startSessionTimer() {
+  App.sessionSecs = 1800; // 30 min
+  clearInterval(App.sessionTimer);
+  clearTimeout(App.sessionWarning);
+  $('session-warn').classList.remove('show');
+  App.sessionWarning = setTimeout(()=>{
+    $('session-warn').classList.add('show');
+    let secs = 300;
+    App.sessionTimer = setInterval(()=>{
+      secs--;
+      const m = Math.floor(secs/60), s = secs%60;
+      const el = $('session-countdown');
+      if(el) el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      if(secs <= 0) { clearInterval(App.sessionTimer); logout(); }
+    }, 1000);
+  }, 25*60*1000); // warn at 25 min
+}
+function extendSession() {
+  startSessionTimer();
+  toast('Session extended!','ok');
+}
+document.addEventListener('click', ()=>{ if(App.user) startSessionTimer(); });
+document.addEventListener('keypress', ()=>{ if(App.user) startSessionTimer(); });
+
+// NAVIGATION
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const pg=$('pg-'+id); if(pg) pg.classList.add('active');
+  document.querySelectorAll(`.nav-tab[data-page="${id}"]`).forEach(t=>t.classList.add('active'));
+  const loaders={dashboard:loadDashboard,history:loadHistory,profile:loadProfile,
+                 tickets:loadMyTickets,policies:loadPolicies,analytics:loadAnalytics,admin:loadAdmin};
+  if (loaders[id]) loaders[id]();
+  if (id==='tools') switchToolTab('health');
+}
+
+// LOGIN
+let _ltype = 'student';
+function setLType(t) {
+  _ltype = t;
+  document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('active'));
+  $('ltab-'+t).classList.add('active');
+  $('l-label').textContent = t==='student'?'Student ID':'Admin ID';
+  $('l-id').placeholder   = t==='student'?'e.g. S001':'e.g. A001';
+  const hints={
+    student:'🎓 Demo: <strong>S001/pass123</strong> (Arjun) · <strong>S002/pass123</strong> (Priya) · <strong>S003/pass123</strong> (Rohan)',
+    admin:'⚙️ Demo: <strong>A001/admin123</strong> (Dr. Rajesh Kumar — Superadmin)'
+  };
+  $('demo-hint').innerHTML = hints[t];
+}
+
+async function doLogin() {
+  const uid=($('l-id').value||'').trim(), pw=($('l-pass').value||'').trim();
+  const err=$('l-err');
+  if(!uid||!pw){err.style.display='block';err.textContent='Enter ID and Password';return;}
+  const btn=$('l-btn'); btn.disabled=true; btn.textContent='Logging in…'; err.style.display='none';
+  try {
+    const d = await api('/auth/login','POST',{user_id:uid,password:pw,user_type:_ltype});
+    App.user=d.user; App.userType=d.user_type;
+    setupNav(); showPage('chat'); startSessionTimer();
+    toast(`Namaste, ${App.user.name.split(' ')[0]}! 👋`,'ok');
+  } catch(e) {
+    err.style.display='block'; err.textContent='❌ '+e.message;
+  }
+  btn.disabled=false; btn.textContent='Login →';
+}
+
+function logout() {
+  App.user=null; App.userType=null;
+  clearTimeout(App.sessionWarning); clearInterval(App.sessionTimer);
+  $('session-warn').classList.remove('show');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('pg-login').classList.add('active');
+  $('nav-main').style.display='none';
+  $('user-chip').style.display='none';
+  $('logout-btn').style.display='none';
+  $('notif-btn').style.display='none';
+  toast('Logged out','info');
+}
+
+function setupNav() {
+  const u=App.user;
+  $('nav-main').style.display='flex';
+  $('user-chip').style.display='flex';
+  $('logout-btn').style.display='flex';
+  $('notif-btn').style.display='flex';
+  const init=u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  $('nav-av').textContent=init;
+  $('nav-av').className=`uav ${App.userType==='admin'?'uav-a':'uav-s'}`;
+  $('nav-uname').textContent=u.name.split(' ')[0];
+  const rt=$('nav-rtag');
+  rt.textContent=App.userType; rt.className=`rtag rt-${App.userType==='admin'?'a':'s'}`;
+  $('tab-admin').style.display=App.userType==='admin'?'flex':'none';
+  if(u.email){const el=$('c-email');if(el)el.value=u.email;}
+  if(u.name) {const el=$('c-name'); if(el)el.value=u.name;}
+  loadNotifications();
+}
+
+// NOTIFICATIONS
+async function loadNotifications() {
+  try {
+    const [d,n] = await Promise.all([api('/deadlines'), api('/notices')]);
+    const urgent = (d.deadlines||[]).filter(x=>x.urgent).length + (n.notices||[]).filter(x=>x.priority==='high').length;
+    const dot = $('notif-dot');
+    if(dot) dot.style.display = urgent>0?'block':'none';
+  } catch{}
+}
+function toggleNotifs() {
+  $('modal-notifs').classList.add('open');
+  loadNotifsContent();
+}
+function hideNotifs() { $('modal-notifs').classList.remove('open'); }
+async function loadNotifsContent() {
+  const el = $('notifs-content');
+  el.innerHTML = '<div class="empty"><span class="ei">⌛</span><p>Loading…</p></div>';
+  try {
+    const [d,n] = await Promise.all([api('/deadlines'), api('/notices')]);
+    let html = '';
+    const urgent = (d.deadlines||[]).filter(x=>x.urgent);
+    const hiNotices = (n.notices||[]).filter(x=>x.priority==='high');
+    if(urgent.length) {
+      html += `<div class="ctitle">🚨 Urgent Deadlines</div>`;
+      urgent.forEach(x=>{ html+=`<div class="alert adanger mb8">📅 ${esc(x.title)} — <strong>${fmtD(x.deadline_date)}</strong></div>`; });
+    }
+    if(hiNotices.length) {
+      html += `<div class="ctitle mt12">📢 Important Notices</div>`;
+      hiNotices.forEach(x=>{ html+=`<div class="alert awarn mb8"><strong>${esc(x.title)}</strong><br/><span style="font-size:12px">${esc(x.content?.slice(0,100))}…</span></div>`; });
+    }
+    if(!html) html = '<div class="empty"><span class="ei">✅</span><p>No urgent notifications</p></div>';
+    el.innerHTML = html;
+    const dot = $('notif-dot');
+    if(dot) dot.style.display = (urgent.length+hiNotices.length)>0?'block':'none';
+  } catch(e) {
+    el.innerHTML = `<div class="alert adanger">Could not load: ${esc(e.message)}</div>`;
+  }
+}
+
+// LANGUAGE
+function setLang(lang) {
+  App.lang=lang;
+  document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`.lbtn[data-lang="${lang}"]`).forEach(b=>b.classList.add('active'));
+  buildChips();
+  const ph={
+    en:'Ask anything — college, general knowledge, jokes, coding…',
+    gu:'Koi pan sawal puchho — college, general knowledge, jokes…',
+    hi:'Kuch bhi pucho — college, general knowledge, jokes…'
+  };
+  $('c-input').placeholder=ph[lang]||ph.en;
+}
+function buildChips() {
+  $('chips').innerHTML=(CHIPS[App.lang]||CHIPS.en).map(q=>
+    `<span class="chip" onclick="useChip(this)">${esc(q)}</span>`
+  ).join('');
+}
+function useChip(el){$('c-input').value=el.textContent;$('c-input').focus();}
+
+// AGENTS
+function buildAgents() {
+  $('alist').innerHTML=AGENTS.map(a=>
+    `<div class="aitem idle" id="ag-${a.id}">
+       <div class="adot"></div>
+       <div><div class="aname">${a.icon} ${a.name}</div><div class="adesc">${a.desc}</div></div>
+     </div>`
+  ).join('');
+}
+function setAgent(id,st){const el=$(`ag-${id}`);if(el)el.className=`aitem ${st}`;}
+function startPipeline() {
+  App.stageIdx=0; AGENTS.forEach(a=>setAgent(a.id,'idle'));
+  App.stageTimer=setInterval(()=>{
+    if(App.stageIdx>0) setAgent(AGENTS[App.stageIdx-1].id,'done');
+    if(App.stageIdx<AGENTS.length){setAgent(AGENTS[App.stageIdx].id,'running');App.stageIdx++;}
+    else clearInterval(App.stageTimer);
+  },680);
+}
+function stopPipeline(ok){clearInterval(App.stageTimer);AGENTS.forEach(a=>setAgent(a.id,ok?'done':'error'));}
+
+// CHAT
+function renderUserMsg(text) {
+  const msgs=$('chat-msgs');
+  const init=App.user?.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()||'?';
+  const t=App.userType==='admin'?'admin':'student';
+  const d=document.createElement('div'); d.className='mrow mine';
+  d.innerHTML=`<div class="mav mav-${t==='admin'?'a':'s'}">${init}</div>
+    <div class="mbody"><div class="mbubble">${esc(text)}</div><div class="mtime">${fmt()}</div></div>`;
+  msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+}
+
+function renderTyping() {
+  const msgs=$('chat-msgs'), id='typ-'+Date.now();
+  const d=document.createElement('div'); d.id=id; d.className='typing-row';
+  d.innerHTML=`<div class="mav mav-ai">🤖</div>
+    <div class="typing-bubble"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; return id;
+}
+
+function renderAIMsg(text, data) {
+  const msgs=$('chat-msgs');
+  const msgId='m-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  App.msgData[msgId]=data||{response:text};
+  const isAdmin=App.userType==='admin';
+  let extras='';
+  if(data && isAdmin) {
+    const outcome=(data.decision_outcome||'').replace('DecisionOutcome.','');
+    const lang=(data.language_detected||'').replace('Language.','');
+    const emotion=data.emotion_detected||'neutral';
+    const conf=Math.round((data.decision_confidence||0)*100);
+    const cc=conf>=80?'var(--grn)':conf>=55?'var(--amb)':'var(--red)';
+    extras+=`<div class="flex gap6" style="flex-wrap:wrap">
+      <span class="badge b-medium">🌐 ${esc(lang)}</span>
+      <span class="badge b-low">${esc((data.intent||'').replace(/_/g,' '))}</span>
+      <span class="badge b-closed">💭 ${esc(emotion)}</span>
+      <span class="badge b-closed">⏱ ${data.processing_time_ms||0}ms</span>
+    </div>`;
+    if(outcome){
+      const refs=(data.policy_references||[]).length;
+      extras+=`<div class="flex aic gap8" style="padding:10px 14px;background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r)">
+        <div style="font-size:1.3rem">${OUTCOME_ICON[outcome]||'❓'}</div>
+        <div><div class="fw6" style="color:${outcome==='allowed'?'var(--grn)':outcome==='not_allowed'?'var(--red)':outcome==='conditional'?'var(--amb)':'var(--tx2)'};text-transform:capitalize">${outcome.replace(/_/g,' ')}</div>
+          <div class="csec mono" style="font-size:11px">${refs} polic${refs===1?'y':'ies'} checked</div></div>
+        <div style="margin-left:auto;text-align:right"><div class="fw7" style="font-size:1.1rem;color:${cc}">${conf}%</div>
+          <div class="cmut mono" style="font-size:10px">confidence</div></div>
+      </div>`;
+    }
+  }
+  if(data?.form_suggestion) extras+=`<div class="form-tag">📋 Suggested: <strong>${esc(data.form_suggestion)}</strong></div>`;
+  extras+=`<div class="mactions">
+    <button class="mact ma-copy"  onclick="cpMsg('${msgId}')">📋 Copy</button>
+    <button class="mact ma-dl"    onclick="dlMsg('${msgId}')">📄 Download</button>
+    <button class="mact ma-speak" onclick="spkMsg('${msgId}')" id="spk-${msgId}">🔊 Speak</button>
+  </div>`;
+  const d=document.createElement('div'); d.className='mrow ai';
+  d.innerHTML=`<div class="mav mav-ai">🤖</div>
+    <div class="mbody">
+      <div class="mbubble">${esc(text)}</div>
+      ${extras?`<div class="mextra">${extras}</div>`:''}
+      <div class="mtime">${fmt()}</div>
+    </div>`;
+  msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+}
+
+function cpMsg(id){copyText((App.msgData[id]||{}).response||'');}
+function dlMsg(id){downloadResp(App.msgData[id]||{});}
+function spkMsg(id){speakText((App.msgData[id]||{}).response||'',id);}
+
+function copyText(text){
+  if(navigator.clipboard){navigator.clipboard.writeText(String(text||'')).then(()=>toast('Copied!','ok')).catch(()=>fbCopy(text));}
+  else fbCopy(text);
+}
+function fbCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=String(text||''); ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');toast('Copied!','ok');}catch{toast('Copy failed','err');}
+  document.body.removeChild(ta);
+}
+function downloadResp(data){
+  try{
+    const d=(typeof data==='string')?JSON.parse(data):data;
+    const lines=[
+      '╔══════════════════════════════════════════╗',
+      '║   CampusAI v7.0 — Query Response         ║',
+      '╚══════════════════════════════════════════╝',
+      '',`Ticket   : ${d.ticket_id||'N/A'}`,
+      `Date     : ${new Date().toLocaleString()}`,
+      `Language : ${(d.language_detected||'').replace('Language.','')}`,
+      `Intent   : ${(d.intent||'').replace(/_/g,' ')}`,
+      `Emotion  : ${d.emotion_detected||'neutral'}`,
+      '','──────────────────────────────────────────',
+      'RESPONSE','──────────────────────────────────────────',
+      '',d.response||'',
+      '','══════════════════════════════════════════',
+      `CampusAI v7.0 | ${new Date().toLocaleString()}`,
+    ].join('\n');
+    const blob=new Blob([lines],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`CampusAI_${d.ticket_id||'response'}_${Date.now()}.txt`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    toast('Downloaded!','ok');
+  }catch(e){toast('Download failed: '+e.message,'err');}
+}
+function speakText(text,msgId){
+  if(!('speechSynthesis' in window)){toast('Voice not supported','err');return;}
+  if(App.speaking){window.speechSynthesis.cancel();App.speaking=false;
+    const b=document.getElementById('spk-'+msgId);if(b)b.textContent='🔊 Speak';return;}
+  const u=new SpeechSynthesisUtterance(String(text||'').slice(0,400));
+  u.lang=App.lang==='gu'?'gu-IN':App.lang==='hi'?'hi-IN':'en-IN';
+  u.rate=1.0;u.pitch=1.0;
+  u.onend=()=>{App.speaking=false;const b=document.getElementById('spk-'+msgId);if(b)b.textContent='🔊 Speak';};
+  App.speaking=true;
+  const b=document.getElementById('spk-'+msgId);if(b)b.textContent='⏹ Stop';
+  window.speechSynthesis.speak(u);
+}
+
+// VOICE INPUT
+function toggleMic(){
+  const btn=$('mic-btn');
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){toast('Voice not supported','err');return;}
+  if(App.mic){App.mic.stop();App.mic=null;btn.classList.remove('active');return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  App.mic=new SR(); App.mic.lang=App.lang==='gu'?'gu-IN':App.lang==='hi'?'hi-IN':'en-IN';
+  App.mic.continuous=false; App.mic.interimResults=false;
+  App.mic.onresult=e=>{$('c-input').value=e.results[0][0].transcript;btn.classList.remove('active');App.mic=null;toast('🎙️ Captured!','ok');};
+  App.mic.onerror=App.mic.onend=()=>{btn.classList.remove('active');App.mic=null;};
+  App.mic.start(); btn.classList.add('active'); toast('🎙️ Listening…','info');
+}
+
+// SEND MESSAGE
+async function sendMsg(){
+  const ta=$('c-input'), q=ta.value.trim();
+  if(!q||App.busy) return;
+  ta.value=''; ta.style.height='44px'; App.busy=true; $('send-btn').disabled=true;
+  renderUserMsg(q); const typId=renderTyping(); startPipeline();
+  try{
+    const body={query:q,user_id:App.user?.student_id||App.user?.admin_id||null,
+                user_type:App.userType||'student',
+                student_email:$('c-email')?.value?.trim()||null,
+                student_name:$('c-name')?.value?.trim()||null,
+                session_id:'sess-'+Date.now()};
+    const data=await api('/query','POST',body);
+    stopPipeline(true); document.getElementById(typId)?.remove();
+    renderAIMsg(data.response||'Please contact helpdesk@college.edu', data);
+  }catch(e){
+    stopPipeline(false); document.getElementById(typId)?.remove();
+    renderAIMsg("Sorry, I'm having trouble right now. Please try again or contact helpdesk@college.edu.", null);
+    toast('Error: '+e.message,'err');
+  }
+  App.busy=false; $('send-btn').disabled=false;
+}
+
+function initChatInput(){
+  const ta=$('c-input'); if(!ta) return;
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+  ta.addEventListener('input',()=>{ta.style.height='44px';ta.style.height=Math.min(ta.scrollHeight,130)+'px';});
+}
+
+// DASHBOARD
+async function loadDashboard(){
+  const u=App.user; if(!u) return;
+  $('dash-name').textContent=u.name?.split(' ')[0]||'User';
+  if(App.userType==='student'){
+    const cc=v=>v>=8?'var(--grn)':v>=6?'var(--amb)':'var(--red)';
+    const ac=v=>v>=75?'var(--grn)':v>=60?'var(--amb)':'var(--red)';
+    $('dash-stats').innerHTML=[
+      {e:'📊',v:u.cgpa,l:'CGPA',c:cc(u.cgpa),p:(u.cgpa/10)*100},
+      {e:'📅',v:u.attendance+'%',l:'Attendance',c:ac(u.attendance),p:u.attendance},
+      {e:'⚠️',v:u.backlogs,l:'Backlogs',c:u.backlogs>0?'var(--red)':'var(--grn)',p:0},
+      {e:'💰',v:'₹'+(u.fees_due||0).toLocaleString(),l:'Fees Due',c:u.fees_due>0?'var(--red)':'var(--grn)',p:0},
+      {e:'🎓',v:'Sem '+u.semester,l:'Semester',c:'var(--blue)',p:0},
+      {e:'🏛️',v:(u.department||'—').split(' ')[0],l:'Department',c:'var(--pur)',p:0},
+    ].map(s=>`<div class="scard"><div class="semi">${s.e}</div><div class="sval" style="color:${s.c}">${esc(String(s.v))}</div><div class="slbl">${s.l}</div>${s.p>0?`<div class="sbar"><div class="sbarfill" style="width:${Math.min(s.p,100).toFixed(1)}%;background:${s.c}"></div></div>`:''}</div>`).join('');
+
+    const alerts=[];
+    if(u.backlogs>0) alerts.push(`<div class="alert awarn">⚠️ ${u.backlogs} backlog(s) — Register for ATKT before deadline!</div>`);
+    if(u.fees_due>0) alerts.push(`<div class="alert adanger">💸 Fees due: ₹${Number(u.fees_due).toLocaleString()} — Pay before deadline!</div>`);
+    if(u.cgpa>=8.5)  alerts.push(`<div class="alert agood">🏆 Merit Scholarship eligible — CGPA ${u.cgpa} ≥ 8.5!</div>`);
+    if(u.attendance<75&&u.attendance>=60) alerts.push(`<div class="alert awarn">⚠️ Attendance ${u.attendance}% below required 75%!</div>`);
+    if(u.attendance<60) alerts.push(`<div class="alert adanger">🚨 Critical! Attendance ${u.attendance}% — risk of detention!</div>`);
+    const ab=$('dash-alerts'); if(ab) ab.innerHTML=alerts.join('');
+  } else {
+    try{
+      const [an,ss,tk]=await Promise.all([api('/analytics'),api('/students'),api('/tickets')]);
+      $('dash-stats').innerHTML=[
+        {e:'💬',v:an.total_queries||0,l:'Total Queries',c:'var(--blue)'},
+        {e:'👥',v:ss.total||0,l:'Students',c:'var(--grn)'},
+        {e:'🎫',v:tk.total||0,l:'Tickets',c:'var(--amb)'},
+        {e:'📊',v:(an.top_intents||[]).length,l:'Intent Types',c:'var(--pur)'},
+      ].map(s=>`<div class="scard"><div class="semi">${s.e}</div><div class="sval" style="color:${s.c}">${s.v}</div><div class="slbl">${s.l}</div></div>`).join('');
+    }catch{}
+  }
+  try{const d=await api('/deadlines'); renderDeadlines(d.deadlines||[]);}catch{}
+  try{const n=await api('/notices');   renderNotices(n.notices||[]);}catch{}
+}
+
+function renderDeadlines(arr){
+  const el=$('dash-deadlines'); if(!el) return;
+  if(!arr.length){el.innerHTML='<div class="empty"><span class="ei">📅</span><p>No upcoming deadlines</p></div>';return;}
+  el.innerHTML=arr.slice(0,6).map(d=>{
+    const dt=new Date(d.deadline_date);
+    return`<div class="dlitem${d.urgent?' urgent':''}">
+      <div class="dldate"><div class="mon">${dt.toLocaleString('en',{month:'short'}).toUpperCase()}</div><div class="day">${dt.getDate()}</div></div>
+      <div class="dlinfo"><div class="dlt">${esc(d.title)}</div><div class="dls">${esc(d.department||'')} · ${esc(d.event_type||'')}</div></div>
+      ${d.urgent?'<span class="utag">Urgent</span>':''}
+    </div>`;
+  }).join('');
+}
+function renderNotices(arr){
+  const el=$('dash-notices'); if(!el) return;
+  if(!arr.length){el.innerHTML='<div class="empty"><span class="ei">📢</span><p>No notices</p></div>';return;}
+  el.innerHTML=arr.slice(0,5).map(n=>`
+    <div class="ncard ${n.priority==='high'?'high':''}">
+      <div class="nt">${esc(n.title)}</div>
+      <div class="nb">${esc(n.content||'')}</div>
+      <div class="nm">📌 ${esc(n.posted_by||'')} · ${esc(n.department||'')} · ${fmtD(n.created_at)}</div>
+    </div>`).join('');
+}
+
+// PROFILE
+function loadProfile(){
+  const u=App.user; if(!u||App.userType!=='student') return;
+  const cc=v=>v>=8?'var(--grn)':v>=6?'var(--amb)':'var(--red)';
+  const ac=v=>v>=75?'var(--grn)':v>=60?'var(--amb)':'var(--red)';
+  const init=u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const alerts=[];
+  if(u.backlogs>0)   alerts.push(`<div class="alert awarn">⚠️ ${u.backlogs} backlog(s) pending</div>`);
+  if(u.fees_due>0)   alerts.push(`<div class="alert adanger">💸 Fees due: ₹${Number(u.fees_due).toLocaleString()}</div>`);
+  if(u.cgpa>=8.5)    alerts.push(`<div class="alert agood">🏆 Merit Scholarship eligible!</div>`);
+  if(u.attendance<75&&u.attendance>=60) alerts.push(`<div class="alert awarn">⚠️ Low attendance: ${u.attendance}%</div>`);
+  $('profile-content').innerHTML=`
+  <div class="prolayout">
+    <div class="procard">
+      <div class="proav">${init}</div>
+      <div class="proname">${esc(u.name)}</div>
+      <div class="proid">${esc(u.student_id)}</div>
+      <div class="prodept">${esc(u.department||'')}</div>
+      <div class="minigrid">
+        <div class="ministat"><div class="val" style="color:${cc(u.cgpa)}">${u.cgpa}</div><div class="lbl">CGPA</div></div>
+        <div class="ministat"><div class="val">Sem ${u.semester}</div><div class="lbl">Semester</div></div>
+        <div class="ministat"><div class="val" style="color:${u.backlogs>0?'var(--red)':'var(--grn)'}">${u.backlogs}</div><div class="lbl">Backlogs</div></div>
+        <div class="ministat"><div class="val" style="color:${ac(u.attendance)}">${u.attendance}%</div><div class="lbl">Attendance</div></div>
+      </div>
+      <div class="progs">
+        <div class="progrow"><span>CGPA</span><span style="color:${cc(u.cgpa)}">${u.cgpa}/10</span></div>
+        <div class="progt"><div class="progf" style="width:${(u.cgpa/10*100).toFixed(1)}%;background:${cc(u.cgpa)}"></div></div>
+        <div class="progrow"><span>Attendance</span><span style="color:${ac(u.attendance)}">${u.attendance}%</span></div>
+        <div class="progt"><div class="progf" style="width:${Math.min(u.attendance,100)}%;background:${ac(u.attendance)}"></div></div>
+        <div class="progrow"><span>Fees Paid</span><span class="cgrn">₹${Number(u.fees_paid||0).toLocaleString()}</span></div>
+        <div class="progt"><div class="progf" style="width:${u.fees_paid&&u.fees_due?Math.round(u.fees_paid/(u.fees_paid+u.fees_due)*100):u.fees_due===0?100:0}%;background:var(--grn)"></div></div>
+      </div>
+    </div>
+    <div class="fc gap12">
+      ${alerts.length?`<div>${alerts.join('')}</div>`:''}
+      <div class="card">
+        <div class="ctitle">📋 Academic Information</div>
+        ${[['Name',u.name],['Student ID',u.student_id],['Email',u.email],['Department',u.department],
+           ['Semester',u.semester],['CGPA',u.cgpa],['Backlogs',u.backlogs],['Attendance',u.attendance+'%'],['Phone',u.phone||'—']]
+          .map(([l,v])=>`<div class="irow2"><span class="ilbl">${l}</span><span class="ival">${esc(String(v??'—'))}</span></div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="ctitle">💰 Fee Status</div>
+        <div class="irow2"><span class="ilbl">Fees Paid</span><span class="ival cgrn">₹${Number(u.fees_paid||0).toLocaleString()}</span></div>
+        <div class="irow2"><span class="ilbl">Fees Due</span><span class="ival" style="color:${u.fees_due>0?'var(--red)':'var(--grn)'}">₹${Number(u.fees_due||0).toLocaleString()}</span></div>
+        <div class="irow2"><span class="ilbl">Status</span><span class="ival" style="color:${u.fees_due>0?'var(--red)':'var(--grn)'}">  ${u.fees_due>0?'⚠️ Pending':'✅ Clear'}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// HISTORY
+async function loadHistory(){
+  const uid=App.user?.student_id||App.user?.admin_id; if(!uid) return;
+  const el=$('history-list'); el.innerHTML='<div class="empty"><span class="ei">⌛</span><p>Loading…</p></div>';
+  try{
+    const d=await api(`/history/${uid}?limit=40`);
+    const hist=d.history||[];
+    if(!hist.length){el.innerHTML='<div class="empty"><span class="ei">🕐</span><p>No chat history yet</p></div>';return;}
+    const bmap={'allowed':'b-resolved','not_allowed':'b-open','conditional':'b-in_progress'};
+    el.innerHTML=hist.map(h=>{
+      const dec=(h.decision||'').replace('DecisionOutcome.','');
+      return`<div class="hitem">
+        <div class="hitop"><div class="hiq">${esc(h.query)}</div>
+          <div class="flex gap6">${dec?`<span class="badge ${bmap[dec]||'b-closed'}">${dec.replace(/_/g,' ')}</span>`:''}<span class="badge b-closed">${Math.round((h.confidence||0)*100)}%</span></div>
+        </div>
+        <div class="hire">${esc(h.response||'')}</div>
+        <div class="hifoot"><span>🌐 ${esc(h.language||'en')}</span>·<span>${esc((h.intent||'').replace(/_/g,' '))}</span>·<span>${fmtDT(h.timestamp)}</span></div>
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML=`<div class="empty"><span class="ei">⚠️</span><p>${esc(e.message)}</p></div>`;}
+}
+
+// TICKETS
+async function loadMyTickets(){
+  const sid=App.user?.student_id; if(!sid||App.userType!=='student') return;
+  const el=$('tickets-list');
+  try{const d=await api(`/tickets/student/${sid}`); renderTkCards(d.tickets||[],el,false);}
+  catch(e){el.innerHTML=`<div class="empty"><span class="ei">⚠️</span><p>${esc(e.message)}</p></div>`;}
+}
+function showNewTicket(){$('modal-new-ticket').classList.add('open');}
+function hideNewTicket(){$('modal-new-ticket').classList.remove('open');$('form-new-ticket')?.reset();}
+async function submitNewTicket(){
+  const sub=$('nt-sub').value.trim(), desc=$('nt-desc').value.trim();
+  if(!sub||!desc){toast('Fill all fields','err');return;}
+  const data={student_id:App.user?.student_id,subject:sub,description:desc,
+    department:$('nt-dept').value,priority:$('nt-pri').value};
+  try{
+    await api('/tickets','POST',data);
+    toast('Ticket submitted!','ok'); hideNewTicket(); loadMyTickets();
+  }catch(e){toast('Error: '+e.message,'err');}
+}
+
+function renderTkCards(tickets,container,adminMode){
+  if(!container) return;
+  if(!tickets.length){container.innerHTML='<div class="empty"><span class="ei">🎫</span><p>No tickets found</p></div>';return;}
+  container.innerHTML=tickets.map(t=>`
+    <div class="tkcard">
+      <div class="tkhd"><span class="tkid">${esc(t.ticket_id)}</span>
+        <div class="tkbadges"><span class="badge b-${t.status||'open'}">${(t.status||'open').replace('_',' ')}</span><span class="badge b-${t.priority||'medium'}">${t.priority||'medium'}</span></div>
+      </div>
+      <div class="tksub">${esc(t.subject||'')}</div>
+      <div class="tkmeta">${esc(t.department||'')} · ${esc(t.student_id||'')} · ${fmtD(t.created_at)}</div>
+      ${t.description?`<div class="tkdesc">${esc(t.description.slice(0,160))}${t.description.length>160?'…':''}</div>`:''}
+      ${t.resolution?`<div class="tkres">✓ ${esc(t.resolution)}</div>`:''}
+      ${adminMode&&t.status!=='resolved'?`<button class="btn btn-p btn-sm mt8" onclick="resolveTicket('${esc(t.ticket_id)}',this)">✓ Mark Resolved</button>`:''}
+    </div>`).join('');
+}
+async function resolveTicket(tid,btn){
+  btn.disabled=true; btn.textContent='Resolving…';
+  try{await api(`/tickets/${tid}`,'PATCH',{status:'resolved',resolution:'Resolved by admin.'});toast('Resolved!','ok');loadAdminTickets();}
+  catch(e){toast('Error: '+e.message,'err');btn.disabled=false;btn.textContent='✓ Mark Resolved';}
+}
+
+// POLICIES
+async function loadPolicies(){
+  const el=$('polgrid'); el.innerHTML='<div class="empty"><span class="ei">⌛</span><p>Loading…</p></div>';
+  try{
+    const d=await api('/policies'); const pols=d.policies||[];
+    if(!pols.length){el.innerHTML='<div class="empty"><span class="ei">📂</span><p>No policy files found</p></div>';return;}
+    const ic={exam:'📝',admin:'🏛️',placement:'💼',general:'📄'};
+    el.innerHTML=pols.map(p=>`
+      <div class="polcard">
+        <div class="policon pi-${p.department||'general'}">${ic[p.department]||'📄'}</div>
+        <div class="polname" title="${esc(p.name)}">${esc(p.name)}</div>
+        <div class="poldesc">${esc(p.description||'')}</div>
+        <div class="polfoot"><span class="poltag">${esc(p.department)}</span><span class="cmut mono" style="font-size:10px">${p.size_kb}KB</span></div>
+      </div>`).join('');
+  }catch{el.innerHTML='<div class="empty"><span class="ei">📂</span><p>Could not load</p></div>';}
+}
+async function reindex(){
+  toast('Re-indexing started (~30 sec)…','info');
+  try{await api('/ingest','POST');toast('Re-indexing started!','ok');setTimeout(loadPolicies,10000);}
+  catch{toast('Run: python tools/ingest_policies.py','err');}
+}
+
+// ANALYTICS
+async function loadAnalytics(){
+  const el=$('analytics-content'); el.innerHTML='<div class="empty"><span class="ei">⌛</span><p>Loading…</p></div>';
+  try{
+    const d=await api('/analytics');
+    const ii=d.top_intents||[],ll=d.languages||[],dd=d.daily||[],tt=d.ticket_stats||[],dp=d.dept_load||[];
+    const mi=Math.max(...ii.map(x=>x.c),1),ml=Math.max(...ll.map(x=>x.c),1),md=Math.max(...dd.map(x=>x.c),1);
+    el.innerHTML=`
+      <div class="sgrid mb16">
+        <div class="scard"><div class="semi">💬</div><div class="sval">${d.total_queries||0}</div><div class="slbl">Total Queries</div></div>
+        <div class="scard"><div class="semi">🎯</div><div class="sval">${ii.length}</div><div class="slbl">Intent Types</div></div>
+        <div class="scard"><div class="semi">🌐</div><div class="sval">${ll.length}</div><div class="slbl">Languages</div></div>
+        <div class="scard"><div class="semi">🎫</div><div class="sval">${tt.reduce((a,t)=>a+t.c,0)}</div><div class="slbl">Total Tickets</div></div>
+      </div>
+      <div class="agrid">
+        <div class="card" style="grid-column:1/-1">
+          <div class="ctitle">📈 Daily Query Volume</div>
+          <div class="daycols">${[...dd].reverse().map(d=>`<div class="daycol"><div class="daycol-bar" style="height:${Math.max(6,Math.round((d.c/md)*80))}px" title="${d.day}: ${d.c}"></div><div class="daycol-lbl">${(d.day||'').slice(5)}</div></div>`).join('')||'<div class="cmut">No data yet</div>'}</div>
+        </div>
+        <div class="card"><div class="ctitle">🎯 Top Intents</div>${ii.map(x=>`<div class="barrow"><div class="barlbl">${esc((x.intent||'').replace(/_/g,' '))}</div><div class="bart"><div class="barf" style="width:${Math.round(x.c/mi*100)}%;background:var(--blue)"></div></div><div class="barcnt">${x.c}</div></div>`).join('')||'<div class="cmut">No data yet</div>'}</div>
+        <div class="card"><div class="ctitle">🌐 Languages</div>${ll.map(x=>`<div class="barrow"><div class="barlbl">${esc(x.language||'')}</div><div class="bart"><div class="barf" style="width:${Math.round(x.c/ml*100)}%;background:var(--grn)"></div></div><div class="barcnt">${x.c}</div></div>`).join('')||'<div class="cmut">No data yet</div>'}</div>
+        <div class="card"><div class="ctitle">🎫 Ticket Status</div>${tt.map(t=>{const c={open:'var(--red)',resolved:'var(--grn)',in_progress:'var(--amb)',closed:'var(--tx3)'}[t.status]||'var(--blue)';return`<div class="barrow"><div class="barlbl">${esc((t.status||'').replace(/_/g,' '))}</div><div class="bart"><div class="barf" style="width:100%;background:${c}"></div></div><div class="barcnt">${t.c}</div></div>`;}).join('')||'<div class="cmut">No tickets yet</div>'}</div>
+        <div class="card"><div class="ctitle">🏛️ Dept Load</div>${dp.map(x=>`<div class="barrow"><div class="barlbl">${esc(x.department||'')}</div><div class="bart"><div class="barf" style="width:${Math.round(x.c/Math.max(...dp.map(d=>d.c),1)*100)}%;background:var(--pur)"></div></div><div class="barcnt">${x.c}</div></div>`).join('')||'<div class="cmut">No data yet</div>'}</div>
+      </div>`;
+  }catch{el.innerHTML='<div class="empty"><span class="ei">📊</span><p>No analytics yet. Send queries first!</p></div>';}
+}
+
+// ADMIN
+let _atab='students';
+function loadAdmin(){if(App.userType!=='admin') return; switchAdminTab('students');}
+function switchAdminTab(tab){
+  _atab=tab;
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll(`.atab[data-atab="${tab}"]`).forEach(t=>t.classList.add('active'));
+  document.querySelectorAll('.admin-sec').forEach(s=>s.style.display='none');
+  const sec=$('as-'+tab); if(sec) sec.style.display='block';
+  if(tab==='students') loadAdminStudents();
+  if(tab==='tickets')  loadAdminTickets();
+  if(tab==='queries')  loadAdminQueries();
+  if(tab==='notices')  loadAdminNotices();
+}
+
+async function loadAdminStudents(){
+  try{
+    const d=await api('/students'); const tbody=$('admin-tbody');
+    if(!d.students?.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--tx3)">No students</td></tr>';return;}
+    tbody.innerHTML=d.students.map(s=>{
+      const cc=s.cgpa>=8?'var(--grn)':s.cgpa>=6?'var(--amb)':'var(--red)';
+      return`<tr>
+        <td class="mono cblue">${esc(s.student_id)}</td>
+        <td class="fw6">${esc(s.name)}</td>
+        <td class="csec">${esc(s.department||'')}</td>
+        <td style="text-align:center;color:var(--tx2)">${s.semester}</td>
+        <td style="text-align:center;font-weight:600;color:${cc}">${s.cgpa}</td>
+        <td style="text-align:center;color:${s.backlogs>0?'var(--red)':'var(--grn)'}">${s.backlogs}</td>
+        <td style="text-align:center;color:${s.attendance>=75?'var(--grn)':'var(--red)'}">${s.attendance}%</td>
+        <td style="text-align:center;color:${s.fees_due>0?'var(--red)':'var(--grn)'}">₹${Number(s.fees_due||0).toLocaleString()}</td>
+        <td>
+          <button class="btn btn-g btn-sm" onclick="showEditStudent('${esc(s.student_id)}','${esc(s.name)}','${esc(s.email)}','${esc(s.department||'')}',${s.semester},${s.cgpa},${s.attendance},${s.fees_due},${s.backlogs},'${esc(s.phone||'')}')">✏️</button>
+          <button class="btn btn-d btn-sm" onclick="delStudent('${esc(s.student_id)}','${esc(s.name)}')">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }catch(e){toast('Error: '+e.message,'err');}
+}
+
+// EDIT STUDENT
+function showEditStudent(id,name,email,dept,sem,cgpa,att,fdue,back,phone){
+  App.editingStudentId = id;
+  $('es-name').value=name; $('es-email').value=email; $('es-dept').value=dept;
+  $('es-sem').value=sem; $('es-cgpa').value=cgpa; $('es-att').value=att;
+  $('es-fdue').value=fdue; $('es-back').value=back; $('es-phone').value=phone||'';
+  $('modal-edit-student').classList.add('open');
+}
+function hideEditStudent(){$('modal-edit-student').classList.remove('open');App.editingStudentId=null;}
+async function submitEditStudent(){
+  if(!App.editingStudentId){toast('No student selected','err');return;}
+  const data={
+    name:$('es-name').value.trim(),email:$('es-email').value.trim(),
+    department:$('es-dept').value,semester:parseInt($('es-sem').value)||1,
+    cgpa:parseFloat($('es-cgpa').value)||0,attendance:parseFloat($('es-att').value)||75,
+    fees_due:parseFloat($('es-fdue').value)||0,backlogs:parseInt($('es-back').value)||0,
+    phone:$('es-phone').value.trim()
+  };
+  try{
+    await api(`/students/${App.editingStudentId}`,'PATCH',data);
+    toast('Student updated!','ok'); hideEditStudent(); loadAdminStudents();
+  }catch(e){toast('Error: '+e.message,'err');}
+}
+
+async function loadAdminTickets(){
+  const el=$('admin-tklist')||$('as-tickets');
+  try{const d=await api('/tickets'); renderTkCards(d.tickets||[],el,true);}
+  catch(e){if(el)el.innerHTML=`<div class="empty"><span class="ei">⚠️</span><p>${esc(e.message)}</p></div>`;}
+}
+async function loadAdminQueries(){
+  const el=$('admin-qlist'); if(!el) return;
+  el.innerHTML='<div class="empty"><span class="ei">⌛</span><p>Loading…</p></div>';
+  try{
+    const d=await api('/history?limit=60'); const hist=d.history||[];
+    if(!hist.length){el.innerHTML='<div class="empty"><span class="ei">💬</span><p>No queries yet</p></div>';return;}
+    const bmap={'allowed':'b-resolved','not_allowed':'b-open','conditional':'b-in_progress'};
+    el.innerHTML=hist.map(h=>{
+      const dec=(h.decision||'').replace('DecisionOutcome.','');
+      return`<div class="hitem"><div class="hitop"><div class="hiq">${esc(h.query)}</div><span class="badge ${bmap[dec]||'b-closed'}">${dec.replace(/_/g,' ')||'unknown'}</span></div>
+        <div class="hire">${esc(h.response||'')}</div>
+        <div class="hifoot"><span>👤 ${esc(h.user_id||'anon')}</span>·<span>🌐 ${esc(h.language||'')}</span>·<span>${esc((h.intent||'').replace(/_/g,' '))}</span>·<span>${fmtDT(h.timestamp)}</span></div>
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML=`<div class="empty"><span class="ei">⚠️</span><p>${esc(e.message)}</p></div>`;}
+}
+async function loadAdminNotices(){
+  const el=$('admin-nlist'); if(!el) return;
+  try{
+    const d=await api('/notices');
+    el.innerHTML=d.notices?.length?d.notices.map(n=>`
+      <div class="ncard ${n.priority==='high'?'high':''}">
+        <div class="flex jb mb8"><div class="nt">${esc(n.title)}</div><span class="badge b-${n.priority==='high'?'high':'medium'}">${n.priority}</span></div>
+        <div class="nb">${esc(n.content||'')}</div>
+        <div class="nm">${esc(n.posted_by||'')} · ${esc(n.department||'')} · ${fmtD(n.created_at)}</div>
+      </div>`).join(''):'<div class="empty" style="padding:1.5rem"><span class="ei">📢</span><p>No notices yet</p></div>';
+  }catch{}
+}
+
+function showAddStudent(){$('modal-student').classList.add('open');}
+function hideAddStudent(){$('modal-student').classList.remove('open');$('form-student')?.reset();}
+async function submitAddStudent(){
+  const data={student_id:$('ns-id').value.trim(),name:$('ns-name').value.trim(),
+    email:$('ns-email').value.trim(),password:$('ns-pass').value.trim(),
+    department:$('ns-dept').value,semester:parseInt($('ns-sem').value)||1,
+    cgpa:parseFloat($('ns-cgpa').value)||0,attendance:parseFloat($('ns-att').value)||75,
+    fees_due:parseFloat($('ns-fdue').value)||0,backlogs:parseInt($('ns-back').value)||0,
+    phone:$('ns-phone').value.trim()};
+  if(!data.student_id||!data.name||!data.email||!data.password){toast('Fill required fields','err');return;}
+  try{await api('/students','POST',data);toast(`Student ${data.student_id} added!`,'ok');hideAddStudent();loadAdminStudents();}
+  catch(e){toast('Error: '+e.message,'err');}
+}
+async function delStudent(sid,name){
+  if(!confirm(`Delete ${name} (${sid})?`)) return;
+  try{await api(`/students/${sid}`,'DELETE');toast('Deleted','ok');loadAdminStudents();}
+  catch(e){toast('Error: '+e.message,'err');}
+}
+
+function showPostNotice(){$('modal-notice').classList.add('open');}
+function hidePostNotice(){$('modal-notice').classList.remove('open');$('form-notice')?.reset();}
+async function submitNotice(){
+  const data={title:$('n-title').value.trim(),content:$('n-content').value.trim(),
+    posted_by:App.user?.name||'Admin',department:$('n-dept').value.trim()||'All',priority:$('n-priority').value};
+  if(!data.title||!data.content){toast('Fill title and content','err');return;}
+  try{await api('/notices','POST',data);toast('Notice posted!','ok');hidePostNotice();loadAdminNotices();}
+  catch(e){toast('Error: '+e.message,'err');}
+}
+
+// TOOLS
+let _ttab='health';
+function switchToolTab(tab){
+  _ttab=tab;
+  document.querySelectorAll('#pg-tools .atab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll(`#pg-tools .atab[data-atab="${tab}"]`).forEach(t=>t.classList.add('active'));
+  document.querySelectorAll('.toolsec').forEach(s=>s.classList.remove('active'));
+  const sec=$('ts-'+tab); if(sec) sec.classList.add('active');
+  if(tab==='health') loadHealth();
+  if(tab==='ingest') loadToolPolicies();
+  if(tab==='cli')    buildCliChips();
+  if(tab==='traces') loadTraces();
+}
+async function loadHealth(){
+  const el=$('health-content'); if(!el) return;
+  try{
+    const d=await api('/health');
+    const ic=d.index_loaded?'✅ Loaded':d.index_exists?'⚠️ Exists, not loaded':'❌ Not found — run ingest!';
+    const icc=d.index_loaded?'cgrn':d.index_exists?'camb':'cred';
+    el.innerHTML=`
+      <div class="irow2"><span class="ilbl">Status</span><span class="ival cgrn fw6">✅ Online</span></div>
+      <div class="irow2"><span class="ilbl">Version</span><span class="ival mono">7.0.0</span></div>
+      <div class="irow2"><span class="ilbl">LLM Model</span><span class="ival mono cblue">${esc(d.model||'')}</span></div>
+      <div class="irow2"><span class="ilbl">Fast Model</span><span class="ival mono csec">${esc(d.fast_model||'')}</span></div>
+      <div class="irow2"><span class="ilbl">FAISS Index</span><span class="ival ${icc}">${ic}</span></div>
+      <div class="irow2"><span class="ilbl">Traces Stored</span><span class="ival">${d.traces||0}</span></div>
+      <div class="irow2"><span class="ilbl">Checked At</span><span class="ival mono csec">${fmt()}</span></div>`;
+  }catch(e){el.innerHTML=`<div class="alert adanger">❌ Server offline: ${esc(e.message)}</div>`;}
+}
+async function loadToolPolicies(){
+  const el=$('tool-pols'); if(!el) return;
+  try{
+    const d=await api('/policies');
+    el.innerHTML=(d.policies||[]).map(p=>`
+      <div class="irow2"><span class="ilbl mono trunc" style="max-width:200px" title="${esc(p.name)}">${esc(p.name)}</span>
+        <span class="flex gap6 aic"><span class="badge b-medium">${esc(p.department)}</span><span class="cmut mono" style="font-size:11px">${p.size_kb}KB</span></span>
+      </div>`).join('')||'<div class="empty"><p>No policy files</p></div>';
+  }catch{el.innerHTML='<div class="empty"><p>Could not load</p></div>';}
+}
+async function toolIngest(){
+  const btn=$('ingest-btn'),st=$('ingest-status');
+  btn.disabled=true; btn.textContent='⏳ Indexing…';
+  st.innerHTML='<div class="alert awarn">⏳ Re-indexing started. Wait ~30 seconds…</div>';
+  try{
+    await api('/ingest','POST');
+    st.innerHTML='<div class="alert agood">✅ Re-indexing started! Reload policies in ~30 sec.</div>';
+    setTimeout(()=>{loadToolPolicies();loadPolicies();},12000);
+  }catch(e){st.innerHTML=`<div class="alert adanger">❌ ${esc(e.message)}<br/>Run: <code>python tools/ingest_policies.py --force</code></div>`;}
+  setTimeout(()=>{btn.disabled=false;btn.textContent='🔄 Start Re-Indexing';},5000);
+}
+async function toolSendEmail(){
+  const to=$('te-to')?.value.trim(),sub=$('te-sub')?.value.trim(),body=$('te-body')?.value.trim();
+  const st=$('email-status'),btn=$('email-btn');
+  if(!to){toast('Enter recipient email','err');return;}
+  btn.disabled=true; btn.textContent='⏳ Sending…';
+  st.innerHTML='<div class="alert awarn">⏳ Sending…</div>';
+  try{
+    const d=await api('/query','POST',{query:`Send test email: ${body}`,student_email:to,student_name:'Test User',user_type:'student'});
+    st.innerHTML=`<div class="alert agood">✅ Query sent! Ticket: <strong>${esc(d.ticket_id)}</strong></div>`;
+  }catch(e){st.innerHTML=`<div class="alert adanger">❌ ${esc(e.message)}</div>`;}
+  btn.disabled=false; btn.textContent='📤 Send Test';
+}
+
+const CLI_SAMPLES=['Am I eligible for ATKT?','ATKT form bharva eligible chhu?','What is Python?','Tell me a joke!','Fees ni last date?','What is photosynthesis?'];
+function buildCliChips(){
+  const el=$('cli-chips'); if(!el) return;
+  el.innerHTML=CLI_SAMPLES.map(q=>`<span class="chip" onclick="$('cli-q').value=this.textContent;$('cli-q').focus()">${esc(q)}</span>`).join('');
+}
+async function toolRunQuery(){
+  const q=($('cli-q')?.value||'').trim(); if(!q){toast('Enter a query','err');return;}
+  const btn=$('cli-btn'),res=$('cli-result');
+  btn.disabled=true; btn.textContent='⏳ Running…';
+  res.innerHTML='<div class="alert awarn">⏳ Running 5-agent pipeline…</div>';
+  try{
+    const d=await api('/query','POST',{query:q,student_email:$('cli-email')?.value.trim()||null,student_name:$('cli-name')?.value.trim()||null,user_type:App.userType||'student',user_id:App.user?.student_id||App.user?.admin_id||null});
+    const oc=d.decision_outcome||'';
+    const oc_c={allowed:'var(--grn)',not_allowed:'var(--red)',conditional:'var(--amb)',insufficient_info:'var(--tx2)'}[oc]||'var(--blue)';
+    const conf=Math.round((d.decision_confidence||0)*100);
+    const cc=conf>=80?'var(--grn)':conf>=55?'var(--amb)':'var(--red)';
+    const rid='cli-'+Date.now(); App.msgData[rid]=d;
+    res.innerHTML=`<div class="card">
+      <div class="ctitle">📊 Pipeline Result — ${esc(d.ticket_id)}</div>
+      <div class="g2 mb12">
+        <div>
+          <div class="flbl2 mb8">Detection</div>
+          <div class="irow2"><span class="ilbl">Language</span><span class="ival mono">${esc((d.language_detected||'').replace('Language.',''))}</span></div>
+          <div class="irow2"><span class="ilbl">Intent</span><span class="ival mono">${esc((d.intent||'').replace(/_/g,' '))}</span></div>
+          <div class="irow2"><span class="ilbl">Emotion</span><span class="ival">${esc(d.emotion_detected||'neutral')}</span></div>
+          <div class="irow2"><span class="ilbl">Time</span><span class="ival mono">${d.processing_time_ms||0}ms</span></div>
+        </div>
+        <div>
+          <div class="flbl2 mb8">Decision</div>
+          <div class="irow2"><span class="ilbl">Outcome</span><span class="ival fw6" style="color:${oc_c}">${esc(oc.replace(/_/g,' '))}</span></div>
+          <div class="irow2"><span class="ilbl">Confidence</span><span class="ival fw6" style="color:${cc}">${conf}%</span></div>
+          <div class="irow2"><span class="ilbl">Supervisor</span><span class="ival" style="color:${d.supervisor_approved?'var(--grn)':'var(--red)'}">${d.supervisor_approved?'✅ Approved':'❌ Rejected'}</span></div>
+        </div>
+      </div>
+      <div class="mb12"><div class="flbl2 mb8">AI Response</div><div style="font-size:14px;padding:12px 15px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);line-height:1.7;white-space:pre-wrap">${esc(d.response||'')}</div></div>
+      <div class="mactions"><button class="mact ma-copy" onclick="cpMsg('${rid}')">📋 Copy</button><button class="mact ma-dl" onclick="dlMsg('${rid}')">📄 Download</button></div>
+    </div>`;
+  }catch(e){res.innerHTML=`<div class="alert adanger">❌ ${esc(e.message)}</div>`;}
+  btn.disabled=false; btn.textContent='▶ Run Pipeline';
+}
+
+async function loadTraces(){
+  const el=$('traces-list'); if(!el) return;
+  el.innerHTML='<div class="empty"><span class="ei">⌛</span><p>Loading…</p></div>';
+  try{
+    const d=await api('/traces?limit=20'); const traces=[...d.traces||[]].reverse();
+    if(!traces.length){el.innerHTML='<div class="empty"><span class="ei">🔍</span><p>No traces yet</p></div>';return;}
+    el.innerHTML=traces.map(t=>{
+      const dec=t.state?.decision||{};
+      const oc=String(dec.outcome||'').replace('DecisionOutcome.','');
+      const occ={allowed:'b-resolved',not_allowed:'b-open',conditional:'b-in_progress'}[oc]||'b-closed';
+      return`<div style="background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:9px;overflow:hidden">
+        <div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <span class="mono cblue" style="font-size:11px">${esc(t.ticket_id)}</span>
+          <div class="flex gap6"><span class="badge ${occ}">${esc(oc.replace(/_/g,' '))||'unknown'}</span><span class="cmut mono" style="font-size:10.5px">${t.elapsed_ms||0}ms</span></div>
+        </div>
+        <div style="padding:11px 14px;font-size:13px;font-weight:500">${esc(t.state?.raw_query||t.request?.query||'')}</div>
+        <div style="padding:0 14px 10px;display:flex;gap:8px;flex-wrap:wrap;font-family:var(--fm);font-size:11px">
+          <span style="color:var(--pur)">🌐 ${esc(t.state?.detected_language||'')}</span>
+          <span class="cblue">🎯 ${esc((t.state?.intent||'').replace(/_/g,' '))}</span>
+          <span style="color:${t.state?.supervisor_approved?'var(--grn)':'var(--red)'}">${t.state?.supervisor_approved?'✅':'❌'} Supervisor</span>
+        </div>
+        <div style="padding:0 14px 12px;font-size:12.5px;color:var(--tx2);line-height:1.6;border-top:1px solid var(--bd);padding-top:10px;white-space:pre-wrap">${esc((t.state?.final_response||'').slice(0,200))}${(t.state?.final_response||'').length>200?'…':''}</div>
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML=`<div class="alert adanger">❌ ${esc(e.message)}</div>`;}
+}
+
+// HEALTH CHECK
+async function checkHealth(){
+  const dot=$('sdot'),txt=$('stxt');
+  try{
+    const d=await api('/health');
+    dot.className='sdot online';
+    txt.textContent=d.model.replace('llama-','').replace('-versatile','')+(d.index_loaded?' ✓':' · No Index');
+  }catch{dot.className='sdot error';txt.textContent='Offline';}
+}
+
+// MODAL CLOSE ON OVERLAY
+document.addEventListener('click',e=>{if(e.target.classList.contains('moverlay'))e.target.classList.remove('open');});
+
+// INIT
+function init(){
+  applyTheme(); buildAgents(); buildChips(); initChatInput();
+  checkHealth(); setInterval(checkHealth,30000);
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

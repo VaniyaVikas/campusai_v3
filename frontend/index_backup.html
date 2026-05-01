@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CampusAI — Autonomous College Administration</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+<div id="app">
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-logo" href="#" onclick="return false">
+    <div class="nav-logo-box">🎓</div>CampusAI
+  </a>
+  <div class="nav-div"></div>
+  <div class="nav-tabs" id="nav-main" style="display:none">
+    <button class="nav-tab" data-page="chat"      onclick="showPage('chat')">💬 Chat</button>
+    <button class="nav-tab" data-page="dashboard" onclick="showPage('dashboard')">🏠 Dashboard</button>
+    <button class="nav-tab" data-page="history"   onclick="showPage('history')">🕐 History</button>
+    <button class="nav-tab" data-page="profile"   onclick="showPage('profile')">👤 Profile</button>
+    <button class="nav-tab" data-page="tickets"   onclick="showPage('tickets')">🎫 Tickets</button>
+    <button class="nav-tab" data-page="policies"  onclick="showPage('policies')">📋 Policies</button>
+    <button class="nav-tab" data-page="analytics" onclick="showPage('analytics')">📊 Analytics</button>
+    <button class="nav-tab" data-page="tools"     onclick="showPage('tools')">🛠️ Tools</button>
+    <button class="nav-tab flex aic gap6" data-page="admin" id="tab-admin" onclick="showPage('admin')" style="display:none">⚙️ Admin</button>
+  </div>
+  <div class="nav-right">
+    <div class="status-pill"><div class="sdot" id="sdot"></div><span id="stxt">Connecting…</span></div>
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <div class="user-chip" id="user-chip" style="display:none" onclick="showPage('profile')">
+      <div class="uav uav-s" id="nav-av">?</div>
+      <span class="uname" id="nav-uname">User</span>
+      <span class="rtag rt-s" id="nav-rtag">student</span>
+    </div>
+    <button class="icon-btn" id="logout-btn" style="display:none" onclick="logout()" title="Logout">⬅️</button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div class="page active" id="pg-login">
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-icon">🎓</div>
+      <div class="login-title">CampusAI v6.0</div>
+      <div class="login-sub">Autonomous 5-Agent College Administration System</div>
+      <div class="login-tabs">
+        <button class="ltab active" id="ltab-student" onclick="setLType('student')">🎓 Student</button>
+        <button class="ltab"        id="ltab-admin"   onclick="setLType('admin')">⚙️ Admin</button>
+      </div>
+      <div class="field">
+        <label class="flabel" id="l-label">Student ID</label>
+        <input class="finput" id="l-id" placeholder="e.g. S001" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="field">
+        <label class="flabel">Password</label>
+        <input class="finput" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="ferr" id="l-err"></div>
+      <button class="btn-login" id="l-btn" onclick="doLogin()">Login →</button>
+      <div class="demo-hint" id="demo-hint">🎓 Demo: <strong>S001/pass123</strong> (Arjun) · <strong>S002/pass123</strong> (Priya) · <strong>S003/pass123</strong> (Rohan)</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="page" id="pg-chat">
+  <div class="chat-layout">
+    <div class="chat-main">
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="mrow ai">
+          <div class="mav mav-ai">🤖</div>
+          <div class="mbody">
+            <div class="mbubble">
+              <strong>Namaste! 🎓 Welcome to CampusAI v6.0</strong><br/><br/>
+              I'm your Autonomous College Administration Assistant powered by <strong>5 AI Agents</strong>!<br/><br/>
+              Ask me in <strong>English, Gujarati, or Hinglish</strong> about:<br/>
+              📋 Exam &amp; ATKT · 💰 Fees · 📅 Attendance · 💼 Placement · 💬 General
+            </div>
+            <div class="mtime">Just now</div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-bar">
+        <div class="chips" id="chips"></div>
+        <div class="irow">
+          <div class="lseg">
+            <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+            <button class="lbtn"        data-lang="gu" onclick="setLang('gu')">GU</button>
+            <button class="lbtn"        data-lang="hi" onclick="setLang('hi')">HI</button>
+          </div>
+          <button class="micbtn" id="mic-btn" onclick="toggleMic()">🎙️</button>
+          <textarea class="cta" id="c-input" rows="1" placeholder="Ask anything — exam, fees, ATKT, placement…"></textarea>
+          <button class="sendbtn" id="send-btn" onclick="sendMsg()">➤</button>
+        </div>
+        <div class="optrow">
+          <input class="optinput" id="c-email" type="email" placeholder="📧 Email (optional)"/>
+          <input class="optinput" id="c-name"  placeholder="👤 Name (optional)" style="max-width:190px"/>
+        </div>
+      </div>
+    </div>
+    <div class="aside">
+      <div class="aside-hd">🛡️ Agent Pipeline <span class="aside-badge">5 Agents</span></div>
+      <div class="alist" id="alist"></div>
+      <div class="pipe-flow">
+        <div class="pf-t">Pipeline Flow</div>
+        <div class="pf-s">🔍 Query Understanding</div>
+        <div class="pf-a">↓ language + intent</div>
+        <div class="pf-s">📚 Policy Agent</div>
+        <div class="pf-a">↓ FAISS + BM25</div>
+        <div class="pf-s">⚖️ Decision Agent</div>
+        <div class="pf-a">↓ rules applied</div>
+        <div class="pf-s">⚡ Action Agent</div>
+        <div class="pf-a">↓ response built</div>
+        <div class="pf-s">🛡️ Supervisor</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page" id="pg-dashboard">
+  <div class="container">
+    <div class="pg-hd"><h1>👋 Welcome, <span id="dash-name">User</span>!</h1><p>Your college at a glance</p></div>
+    <div class="sgrid" id="dash-stats"></div>
+    <div id="dash-alerts"></div>
+    <div class="g2" style="margin-top:1.2rem">
+      <div><div class="ctitle mb12">📅 Upcoming Deadlines</div><div id="dash-deadlines"><div class="empty"><span class="ei">📅</span><p>Loading…</p></div></div></div>
+      <div><div class="ctitle mb12">📢 College Notices</div><div id="dash-notices"><div class="empty"><span class="ei">📢</span><p>Loading…</p></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="page" id="pg-history">
+  <div class="container">
+    <div class="pg-hd"><h1>🕐 Chat History</h1><p>All your previous queries and AI responses</p></div>
+    <div id="history-list"><div class="empty"><span class="ei">🕐</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="pg-profile">
+  <div class="container">
+    <div class="pg-hd"><h1>👤 My Profile</h1><p>Academic information and status</p></div>
+    <div id="profile-content"></div>
+  </div>
+</div>
+
+<!-- TICKETS -->
+<div class="page" id="pg-tickets">
+  <div class="container">
+    <div class="pg-hd"><h1>🎫 My Tickets</h1><p>Support and complaint tickets</p></div>
+    <div id="tickets-list"><div class="empty"><span class="ei">🎫</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- POLICIES -->
+<div class="page" id="pg-policies">
+  <div class="container">
+    <div class="flex jb aic mb16">
+      <div class="pg-hd" style="margin-bottom:0"><h1>📋 Policy Knowledge Base</h1><p>Hybrid FAISS + BM25 retrieval</p></div>
+      <button class="btn btn-g" onclick="reindex()">🔄 Re-index</button>
+    </div>
+    <div class="polgrid" id="polgrid"><div class="empty"><span class="ei">📂</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="page" id="pg-analytics">
+  <div class="container">
+    <div class="pg-hd"><h1>📊 Analytics</h1><p>Query patterns, languages, system insights</p></div>
+    <div id="analytics-content"><div class="empty"><span class="ei">📊</span><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<!-- TOOLS -->
+<div class="page" id="pg-tools">
+  <div class="container">
+    <div class="pg-hd"><h1>🛠️ Tools Panel</h1><p>Health monitor, policy ingest, email test, CLI tester, trace viewer</p></div>
+    <div class="atabs">
+      <button class="atab active" data-atab="health" onclick="switchToolTab('health')">💚 Health</button>
+      <button class="atab" data-atab="ingest"        onclick="switchToolTab('ingest')">📥 Ingest</button>
+      <button class="atab" data-atab="email"         onclick="switchToolTab('email')">📧 Email</button>
+      <button class="atab" data-atab="cli"           onclick="switchToolTab('cli')">💻 CLI Test</button>
+      <button class="atab" data-atab="traces"        onclick="switchToolTab('traces')">🔍 Traces</button>
+    </div>
+
+    <!-- Health -->
+    <div class="toolsec active" id="ts-health">
+      <div class="g2">
+        <div class="card">
+          <div class="ctitle">💚 Server Status</div>
+          <div id="health-content"><div class="empty"><span class="ei">⌛</span><p>Loading…</p></div></div>
+          <button class="btn btn-g w-full mt12" onclick="loadHealth()">🔄 Refresh</button>
+        </div>
+        <div class="card">
+          <div class="ctitle">🤖 Pipeline Info</div>
+          <div class="irow2"><span class="ilbl">Total Agents</span><span class="ival cblue fw6">5</span></div>
+          <div class="irow2"><span class="ilbl">Vector DB</span><span class="ival">FAISS (local)</span></div>
+          <div class="irow2"><span class="ilbl">Search</span><span class="ival">FAISS + BM25 hybrid</span></div>
+          <div class="irow2"><span class="ilbl">Embedding</span><span class="ival mono">all-MiniLM-L6-v2</span></div>
+          <div class="irow2"><span class="ilbl">Database</span><span class="ival">SQLite</span></div>
+          <div class="irow2"><span class="ilbl">Languages</span><span class="ival">EN / GU / HI</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ingest -->
+    <div class="toolsec" id="ts-ingest">
+      <div class="g2">
+        <div class="card">
+          <div class="ctitle">📥 Re-Index Policies</div>
+          <p class="csec" style="font-size:13px;line-height:1.7;margin-bottom:1rem">Place <code style="color:var(--blue)">.txt</code> or <code style="color:var(--blue)">.pdf</code> in <code style="color:var(--blue)">data/policies/</code> then click below.</p>
+          <div class="alert awarn mb12">⚠️ Takes ~30 seconds. API stays live during indexing.</div>
+          <button class="btn btn-p w-full" id="ingest-btn" onclick="toolIngest()">🔄 Start Re-Indexing</button>
+          <div id="ingest-status" class="mt12"></div>
+        </div>
+        <div class="card"><div class="ctitle">📂 Policy Files</div><div id="tool-pols"><div class="empty"><span class="ei">⌛</span><p>Loading…</p></div></div></div>
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="toolsec" id="ts-email">
+      <div class="g2">
+        <div class="card">
+          <div class="ctitle">📧 Test Email Tool</div>
+          <div class="fld mb12"><label class="flbl2">To Email</label><input class="finp2" id="te-to" type="email" placeholder="student@example.com"/></div>
+          <div class="fld mb12"><label class="flbl2">Subject</label><input class="finp2" id="te-sub" value="Test from CampusAI v6.0"/></div>
+          <div class="fld mb16"><label class="flbl2">Message</label><textarea class="finp2" id="te-body" rows="4" style="resize:vertical">Hello! This is a test from CampusAI v6.0.</textarea></div>
+          <button class="btn btn-p w-full" id="email-btn" onclick="toolSendEmail()">📤 Send Test</button>
+          <div id="email-status" class="mt12"></div>
+        </div>
+        <div class="card">
+          <div class="ctitle">⚙️ SMTP Config</div>
+          <div class="alert awarn mb12">Set these in your <strong>.env</strong> file</div>
+          <div style="background:var(--bg4);border-radius:var(--r);padding:14px;font-family:var(--fm);font-size:12px;color:var(--tx2);line-height:2.2">SMTP_HOST=smtp.gmail.com<br/>SMTP_PORT=587<br/>SMTP_USER=your@gmail.com<br/>SMTP_PASS=xxxx xxxx xxxx xxxx</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLI -->
+    <div class="toolsec" id="ts-cli">
+      <div class="card">
+        <div class="ctitle">💻 Pipeline CLI Tester</div>
+        <p class="csec" style="font-size:13px;margin-bottom:1rem">Test the full 5-agent pipeline and see every execution detail.</p>
+        <div class="fld mb8"><label class="flbl2">Query</label><input class="finp2" id="cli-q" placeholder="e.g. Am I eligible for ATKT?" onkeydown="if(event.key==='Enter')toolRunQuery()"/></div>
+        <div class="flex gap8 mb12"><input class="finp2" id="cli-email" type="email" placeholder="Email (optional)" style="flex:1"/><input class="finp2" id="cli-name" placeholder="Name (optional)" style="max-width:200px"/></div>
+        <div class="chips" id="cli-chips"></div>
+        <button class="btn btn-p mt8" id="cli-btn" onclick="toolRunQuery()">▶ Run Pipeline</button>
+        <div id="cli-result" class="mt16"></div>
+      </div>
+    </div>
+
+    <!-- Traces -->
+    <div class="toolsec" id="ts-traces">
+      <div class="card">
+        <div class="ctitle">🔍 Query Traces <button class="btn btn-g btn-sm" onclick="loadTraces()" style="margin-left:auto">🔄 Refresh</button></div>
+        <div id="traces-list"><div class="empty"><span class="ei">🔍</span><p>No traces yet. Run a query first!</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="pg-admin">
+  <div class="container">
+    <div class="pg-hd"><h1>⚙️ Admin Panel</h1><p>Manage students, tickets, notices and all queries</p></div>
+    <div class="atabs">
+      <button class="atab active" data-atab="students" onclick="switchAdminTab('students')">👥 Students</button>
+      <button class="atab" data-atab="tickets"         onclick="switchAdminTab('tickets')">🎫 Tickets</button>
+      <button class="atab" data-atab="queries"         onclick="switchAdminTab('queries')">💬 Queries</button>
+      <button class="atab" data-atab="notices"         onclick="switchAdminTab('notices')">📢 Notices</button>
+    </div>
+
+    <!-- Students -->
+    <div class="admin-sec" id="as-students">
+      <div class="flex jb aic mb16"><div class="fw6">All Students</div><button class="btn btn-p" onclick="showAddStudent()">+ Add Student</button></div>
+      <div class="twrap">
+        <table class="dtable">
+          <thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Sem</th><th>CGPA</th><th>Backlogs</th><th>Attendance</th><th>Fees Due</th><th>Action</th></tr></thead>
+          <tbody id="admin-tbody"><tr><td colspan="9" style="text-align:center;padding:24px;color:var(--tx3)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tickets -->
+    <div class="admin-sec" id="as-tickets" style="display:none">
+      <div id="admin-tklist"><div class="empty"><span class="ei">🎫</span><p>Loading…</p></div></div>
+    </div>
+
+    <!-- Queries -->
+    <div class="admin-sec" id="as-queries" style="display:none">
+      <div id="admin-qlist"><div class="empty"><span class="ei">💬</span><p>Loading…</p></div></div>
+    </div>
+
+    <!-- Notices -->
+    <div class="admin-sec" id="as-notices" style="display:none">
+      <div class="flex jb aic mb16"><div class="fw6">Notices</div><button class="btn btn-p" onclick="showPostNotice()">+ Post Notice</button></div>
+      <div id="admin-nlist"><div class="empty"><span class="ei">📢</span><p>Loading…</p></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- MODAL: ADD STUDENT -->
+<div class="moverlay" id="modal-student">
+  <div class="mbox">
+    <div class="mhead">➕ Add New Student <button class="mclose" onclick="hideAddStudent()">✕</button></div>
+    <div class="mbdy"><form id="form-student">
+      <div class="fgrid">
+        <div class="fld"><label class="flbl2">ID *</label><input class="finp2" id="ns-id" placeholder="S006" required/></div>
+        <div class="fld"><label class="flbl2">Name *</label><input class="finp2" id="ns-name" required/></div>
+        <div class="fld"><label class="flbl2">Email *</label><input class="finp2" id="ns-email" type="email" required/></div>
+        <div class="fld"><label class="flbl2">Password *</label><input class="finp2" id="ns-pass" required/></div>
+        <div class="fld"><label class="flbl2">Department</label>
+          <select class="finp2" id="ns-dept"><option>Computer Science</option><option>Electronics</option><option>Mechanical</option><option>Civil</option><option>Information Technology</option></select>
+        </div>
+        <div class="fld"><label class="flbl2">Semester</label><input class="finp2" id="ns-sem" type="number" min="1" max="8" value="1"/></div>
+        <div class="fld"><label class="flbl2">CGPA</label><input class="finp2" id="ns-cgpa" type="number" step="0.1" value="0"/></div>
+        <div class="fld"><label class="flbl2">Attendance %</label><input class="finp2" id="ns-att" type="number" value="75"/></div>
+        <div class="fld"><label class="flbl2">Fees Due (₹)</label><input class="finp2" id="ns-fdue" type="number" value="0"/></div>
+        <div class="fld"><label class="flbl2">Backlogs</label><input class="finp2" id="ns-back" type="number" value="0"/></div>
+        <div class="fld full"><label class="flbl2">Phone</label><input class="finp2" id="ns-phone"/></div>
+      </div>
+      <div class="mfoot">
+        <button type="button" class="btn btn-p" onclick="submitAddStudent()">Add Student</button>
+        <button type="button" class="btn btn-g" onclick="hideAddStudent()">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+</div>
+
+<!-- MODAL: POST NOTICE -->
+<div class="moverlay" id="modal-notice">
+  <div class="mbox">
+    <div class="mhead">📢 Post Notice <button class="mclose" onclick="hidePostNotice()">✕</button></div>
+    <div class="mbdy"><form id="form-notice">
+      <div class="fld mb12"><label class="flbl2">Title *</label><input class="finp2" id="n-title" required/></div>
+      <div class="fld mb12"><label class="flbl2">Content *</label><textarea class="finp2" id="n-content" rows="4" style="resize:vertical" required></textarea></div>
+      <div class="fgrid">
+        <div class="fld"><label class="flbl2">Department</label><input class="finp2" id="n-dept" placeholder="All Departments"/></div>
+        <div class="fld"><label class="flbl2">Priority</label><select class="finp2" id="n-priority"><option value="normal">Normal</option><option value="high">High</option></select></div>
+      </div>
+      <div class="mfoot">
+        <button type="button" class="btn btn-p" onclick="submitNotice()">Post Notice</button>
+        <button type="button" class="btn btn-g" onclick="hidePostNotice()">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+</div>
+
+<div class="twrap2" id="toast-wrap"></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
