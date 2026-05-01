@@ -1,4 +1,4 @@
-# 🎓 CampusAI v6.0
+# 🎓 CampusAI v7.0
 
 ## Quick Start
 ```powershell
